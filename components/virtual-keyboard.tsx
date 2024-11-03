@@ -2,23 +2,40 @@
 
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { isSpecialKey, KEYBOARD_LAYOUT, type KeyboardKey } from '@/lib/keyboard';
+import { LAYOUTS, mapKeyCode, type KeyboardKey, type LayoutType } from '@/lib/keyboard';
 
-export function VirtualKeyboard() {
+interface VirtualKeyboardProps {
+  layout: LayoutType;
+}
+
+export function VirtualKeyboard({ layout }: VirtualKeyboardProps) {
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
+  const currentLayout = LAYOUTS[layout];
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isSpecialKey(e.code)) {
-        setPressedKeys((prev) => new Set([...prev, e.code]));
+      const mappedKeyCode = mapKeyCode(e.code, 'qwerty', layout);
+
+      const isSpecialKey = Object.values(currentLayout).some((row) =>
+        row.some((key) => key.code === mappedKeyCode && key.isSpecial)
+      );
+
+      if (!isSpecialKey) {
+        setPressedKeys((prev) => new Set([...prev, mappedKeyCode]));
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (!isSpecialKey(e.code)) {
+      const mappedKeyCode = mapKeyCode(e.code, 'qwerty', layout);
+
+      const isSpecialKey = Object.values(currentLayout).some((row) =>
+        row.some((key) => key.code === mappedKeyCode && key.isSpecial)
+      );
+
+      if (!isSpecialKey) {
         setPressedKeys((prev) => {
           const next = new Set(prev);
-          next.delete(e.code);
+          next.delete(mappedKeyCode);
           return next;
         });
       }
@@ -31,52 +48,22 @@ export function VirtualKeyboard() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
-
-  const getKeyWidth = (keyData: KeyboardKey) => {
-    switch (keyData.code) {
-      case 'Backspace':
-        return 'w-[100px]';
-      case 'Tab':
-        return 'w-[100px]';
-      case 'CapsLock':
-        return 'w-[120px]';
-      case 'Enter':
-        return 'w-[120px]';
-      case 'ShiftLeft':
-      case 'ShiftRight':
-        return 'w-[155px]';
-      case 'ControlLeft':
-      case 'ControlRight':
-      case 'AltLeft':
-      case 'AltRight':
-      case 'MetaLeft':
-      case 'MetaRight':
-      case 'Fn':
-        return 'w-[84px]';
-      case 'Space':
-        return 'w-[406px]';
-      default:
-        return 'w-[65px]';
-    }
-  };
+  }, [currentLayout, layout]);
 
   const renderKey = (keyData: KeyboardKey) => {
     const isPressed = pressedKeys.has(keyData.code);
-    const width = getKeyWidth(keyData);
 
     return (
       <div
         key={keyData.code}
         className={cn(
-          'rounded-md border border-gray-700 px-2 text-center',
-          'flex items-center justify-center transition-all duration-100',
-          width,
-          'h-[60px]',
+          'h-10 w-10 rounded-md border border-gray-200 px-2 text-center text-sm',
+          'flex items-center justify-center transition-colors duration-100',
+          keyData.width,
           isPressed
-            ? 'bg-purple-600 text-white shadow-inner'
-            : 'bg-gray-800 text-gray-300 hover:bg-gray-700',
-          keyData.isSpecial ? 'text-sm' : 'text-base font-medium'
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-background hover:bg-accent hover:text-accent-foreground',
+          keyData.isSpecial ? 'text-xs text-muted-foreground' : 'text-sm'
         )}
       >
         {keyData.key}
@@ -85,10 +72,10 @@ export function VirtualKeyboard() {
   };
 
   return (
-    <div className="mx-auto w-fit space-y-2 rounded-lg bg-gray-900 p-6 shadow-lg">
-      {Object.entries(KEYBOARD_LAYOUT).map(([rowKey, keys]) => (
-        <div key={rowKey} className="flex gap-2">
-          {keys.map(renderKey)}
+    <div className="mx-auto w-fit space-y-1 rounded-lg border bg-card p-3 shadow-sm">
+      {Object.entries(currentLayout).map(([rowKey, row]) => (
+        <div key={rowKey} className="flex gap-1">
+          {row.map(renderKey)}
         </div>
       ))}
     </div>
