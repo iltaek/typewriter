@@ -1,18 +1,19 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { KEYBOARD_CONFIGS, remapKey, type KeyboardKey, type LayoutType } from '@/lib/keyboard';
+import { KeyboardRow } from './keyboard-row';
 
 interface VirtualKeyboardProps {
   layout: LayoutType;
 }
 
 export function VirtualKeyboard({ layout }: VirtualKeyboardProps) {
-  const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
+  const [pressedKeys, setPressedKeys] = React.useState<Set<string>>(new Set());
   const currentConfig = KEYBOARD_CONFIGS[layout];
 
-  const handleKeyEvent = useCallback(
+  const handleKeyEvent = React.useCallback(
     (e: KeyboardEvent, action: 'press' | 'release') => {
       const mappedKeyCode = remapKey(e.code, 'qwerty', layout);
 
@@ -35,7 +36,7 @@ export function VirtualKeyboard({ layout }: VirtualKeyboardProps) {
     [currentConfig, layout]
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => handleKeyEvent(e, 'press');
     const handleKeyUp = (e: KeyboardEvent) => handleKeyEvent(e, 'release');
 
@@ -51,25 +52,7 @@ export function VirtualKeyboard({ layout }: VirtualKeyboardProps) {
   return (
     <div className="mx-auto w-fit space-y-1 rounded-lg border bg-card p-3 shadow-sm">
       {Object.entries(currentConfig).map(([rowKey, keys]) => (
-        <div key={rowKey} className="flex gap-1">
-          {keys.map((keyData) => (
-            <div
-              key={keyData.code}
-              data-code={keyData.code}
-              className={cn(
-                'h-10 w-10 rounded-md border border-gray-200 px-2 text-center text-sm',
-                'flex items-center justify-center transition-colors duration-100',
-                keyData.width,
-                pressedKeys.has(keyData.code)
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-background hover:bg-accent hover:text-accent-foreground',
-                keyData.isSpecial ? 'text-xs text-muted-foreground' : 'text-sm'
-              )}
-            >
-              {keyData.key}
-            </div>
-          ))}
-        </div>
+        <KeyboardRow key={rowKey} keys={keys} pressedKeys={pressedKeys} />
       ))}
     </div>
   );

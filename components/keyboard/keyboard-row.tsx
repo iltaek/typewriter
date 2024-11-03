@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { type KeyboardKey } from '@/lib/keyboard';
 import { Key } from './key';
 
@@ -11,7 +11,12 @@ export function KeyboardRow({ keys, pressedKeys }: KeyboardRowProps) {
   return (
     <div className="flex gap-1">
       {keys.map((keyData) => (
-        <Key key={keyData.code} keyData={keyData} isPressed={pressedKeys.has(keyData.code)} />
+        <Key
+          key={keyData.code}
+          keyData={keyData}
+          isPressed={pressedKeys.has(keyData.code)}
+          data-code={keyData.code}
+        />
       ))}
     </div>
   );
