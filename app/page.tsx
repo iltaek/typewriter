@@ -1,7 +1,9 @@
 'use client';
 
+import { WordDisplay } from '@/components/typing/word-display';
+import { VirtualKeyboard } from '@/components/keyboard';
+import { LayoutSelector } from '@/components/layout-selector';
 import { useState } from 'react';
-import { VirtualKeyboard } from '@/components/virtual-keyboard';
 import type { LayoutType } from '@/lib/keyboard';
 
 export default function Home() {
@@ -11,25 +13,12 @@ export default function Home() {
     <main className="container mx-auto flex min-h-screen flex-col items-center justify-between p-4">
       <div className="flex-1" />
 
+      <div className="mb-16">
+        <WordDisplay layout={layout} />
+      </div>
+
       <div className="w-full max-w-5xl space-y-4">
-        <div className="flex justify-center gap-4">
-          <button
-            onClick={() => setLayout('qwerty')}
-            className={`px-4 py-2 rounded-md ${
-              layout === 'qwerty' ? 'bg-primary text-primary-foreground' : 'bg-secondary'
-            }`}
-          >
-            QWERTY
-          </button>
-          <button
-            onClick={() => setLayout('colemak')}
-            className={`px-4 py-2 rounded-md ${
-              layout === 'colemak' ? 'bg-primary text-primary-foreground' : 'bg-secondary'
-            }`}
-          >
-            Colemak
-          </button>
-        </div>
+        <LayoutSelector currentLayout={layout} onLayoutChange={setLayout} />
         <VirtualKeyboard layout={layout} />
       </div>
     </main>

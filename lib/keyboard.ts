@@ -13,6 +13,11 @@ export type KeyboardLayout = {
   row5: KeyboardKey[];
 };
 
+export type LayoutType = 'qwerty' | 'colemak';
+
+export type KeyMap = Record<string, string>;
+
+// QWERTY 레이아웃 정의
 export const QWERTY_LAYOUT: KeyboardLayout = {
   row1: [
     { key: '`', code: 'Backquote' },
@@ -78,19 +83,17 @@ export const QWERTY_LAYOUT: KeyboardLayout = {
   row5: [
     { key: 'Ctrl', code: 'ControlLeft', width: 'w-[1.25rem]', isSpecial: true },
     { key: 'Alt', code: 'AltLeft', width: 'w-[1.25rem]', isSpecial: true },
-    { key: 'Meta', code: 'MetaLeft', width: 'w-[1.25rem]', isSpecial: true },
     { key: 'Space', code: 'Space', width: 'w-[6.25rem]', isSpecial: true },
-    { key: 'Meta', code: 'MetaRight', width: 'w-[1.25rem]', isSpecial: true },
     { key: 'Alt', code: 'AltRight', width: 'w-[1.25rem]', isSpecial: true },
     { key: 'Ctrl', code: 'ControlRight', width: 'w-[1.25rem]', isSpecial: true },
-    { key: 'Fn', code: 'Fn', width: 'w-[1.25rem]', isSpecial: true },
   ],
 };
 
+// Colemak 레이아웃 정의
 export const COLEMAK_LAYOUT: KeyboardLayout = {
   row1: QWERTY_LAYOUT.row1,
   row2: [
-    { key: 'Tab', code: 'Tab', width: 'w-16', isSpecial: true },
+    { key: 'Tab', code: 'Tab', width: 'w-[1.5rem]', isSpecial: true },
     { key: 'Q', code: 'KeyQ' },
     { key: 'W', code: 'KeyW' },
     { key: 'F', code: 'KeyF' },
@@ -103,10 +106,10 @@ export const COLEMAK_LAYOUT: KeyboardLayout = {
     { key: ';', code: 'Semicolon' },
     { key: '[', code: 'BracketLeft' },
     { key: ']', code: 'BracketRight' },
-    { key: '\\', code: 'Backslash' },
+    { key: '\\', code: 'Backslash', width: 'w-[1.5rem]' },
   ],
   row3: [
-    { key: 'Caps', code: 'CapsLock', width: 'w-[4.5rem]', isSpecial: true },
+    { key: 'Caps', code: 'CapsLock', width: 'w-[1.75rem]', isSpecial: true },
     { key: 'A', code: 'KeyA' },
     { key: 'R', code: 'KeyR' },
     { key: 'S', code: 'KeyS' },
@@ -118,10 +121,10 @@ export const COLEMAK_LAYOUT: KeyboardLayout = {
     { key: 'I', code: 'KeyI' },
     { key: 'O', code: 'KeyO' },
     { key: "'", code: 'Quote' },
-    { key: 'Enter', code: 'Enter', width: 'w-[4.5rem]', isSpecial: true },
+    { key: 'Enter', code: 'Enter', width: 'w-[2.25rem]', isSpecial: true },
   ],
   row4: [
-    { key: 'Shift', code: 'ShiftLeft', width: 'w-[5.5rem]', isSpecial: true },
+    { key: 'Shift', code: 'ShiftLeft', width: 'w-[2.25rem]', isSpecial: true },
     { key: 'Z', code: 'KeyZ' },
     { key: 'X', code: 'KeyX' },
     { key: 'C', code: 'KeyC' },
@@ -132,32 +135,15 @@ export const COLEMAK_LAYOUT: KeyboardLayout = {
     { key: ',', code: 'Comma' },
     { key: '.', code: 'Period' },
     { key: '/', code: 'Slash' },
-    { key: 'Shift', code: 'ShiftRight', width: 'w-[5.5rem]', isSpecial: true },
+    { key: 'Shift', code: 'ShiftRight', width: 'w-[2.75rem]', isSpecial: true },
   ],
   row5: QWERTY_LAYOUT.row5,
 };
 
-export type LayoutType = 'qwerty' | 'colemak';
-
-export const LAYOUTS: Record<LayoutType, KeyboardLayout> = {
+// 키보드 설정
+export const KEYBOARD_CONFIGS: Record<LayoutType, KeyboardLayout> = {
   qwerty: QWERTY_LAYOUT,
   colemak: COLEMAK_LAYOUT,
-};
-
-export const isSpecialKey = (key: string) => {
-  return Object.values(LAYOUTS).some(
-    (layout) =>
-      layout.row1.some((k) => k.code === key && k.isSpecial) ||
-      layout.row2.some((k) => k.code === key && k.isSpecial) ||
-      layout.row3.some((k) => k.code === key && k.isSpecial) ||
-      layout.row4.some((k) => k.code === key && k.isSpecial) ||
-      layout.row5.some((k) => k.code === key && k.isSpecial)
-  );
-};
-
-// 키 매핑을 위한 타입 정의
-export type KeyMap = {
-  [key: string]: string;
 };
 
 // QWERTY에서 Colemak으로의 매핑
@@ -186,14 +172,50 @@ export const COLEMAK_TO_QWERTY: KeyMap = Object.fromEntries(
   Object.entries(QWERTY_TO_COLEMAK).map(([key, value]) => [value, key])
 );
 
-// 현재 레이아웃에 따라 키 코드를 변환하는 함수
-export const mapKeyCode = (
-  keyCode: string,
-  fromLayout: LayoutType,
-  toLayout: LayoutType
-): string => {
-  if (fromLayout === toLayout) return keyCode;
+// 키 매핑 함수
+export const remapKey = (code: string, fromLayout: LayoutType, toLayout: LayoutType): string => {
+  if (fromLayout === toLayout) return code;
 
   const mapping = fromLayout === 'qwerty' ? QWERTY_TO_COLEMAK : COLEMAK_TO_QWERTY;
-  return mapping[keyCode] || keyCode;
+  return mapping[code] || code;
+};
+
+// 키 코드에 해당하는 문자 반환
+export const getCharacterFromKeyCode = (
+  code: string,
+  layout: LayoutType,
+  isShift: boolean = false
+): string => {
+  const keyMappings: Record<string, [string, string]> = {
+    KeyA: ['a', 'A'],
+    KeyB: ['b', 'B'],
+    KeyC: ['c', 'C'],
+    KeyD: ['d', 'D'],
+    KeyE: ['e', 'E'],
+    KeyF: ['f', 'F'],
+    KeyG: ['g', 'G'],
+    KeyH: ['h', 'H'],
+    KeyI: ['i', 'I'],
+    KeyJ: ['j', 'J'],
+    KeyK: ['k', 'K'],
+    KeyL: ['l', 'L'],
+    KeyM: ['m', 'M'],
+    KeyN: ['n', 'N'],
+    KeyO: ['o', 'O'],
+    KeyP: ['p', 'P'],
+    KeyQ: ['q', 'Q'],
+    KeyR: ['r', 'R'],
+    KeyS: ['s', 'S'],
+    KeyT: ['t', 'T'],
+    KeyU: ['u', 'U'],
+    KeyV: ['v', 'V'],
+    KeyW: ['w', 'W'],
+    KeyX: ['x', 'X'],
+    KeyY: ['y', 'Y'],
+    KeyZ: ['z', 'Z'],
+    Semicolon: [';', ':'],
+  };
+
+  const mappedCode = layout === 'colemak' ? remapKey(code, 'qwerty', 'colemak') : code;
+  return keyMappings[mappedCode]?.[isShift ? 1 : 0] || '';
 };
