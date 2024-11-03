@@ -1,22 +1,59 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { KEYBOARD_CONFIGS, remapKey, type KeyboardKey, type LayoutType } from '@/lib/keyboard';
+
+interface KeyProps {
+  keyData: KeyboardKey;
+  isPressed: boolean;
+}
+
+function Key({ keyData, isPressed }: KeyProps) {
+  return (
+    <div
+      className={cn(
+        'h-10 w-10 rounded-md border border-gray-200 px-2 text-center text-sm',
+        'flex items-center justify-center transition-colors duration-100',
+        keyData.width,
+        isPressed
+          ? 'bg-primary text-primary-foreground'
+          : 'bg-background hover:bg-accent hover:text-accent-foreground',
+        keyData.isSpecial ? 'text-xs text-muted-foreground' : 'text-sm'
+      )}
+    >
+      {keyData.key}
+    </div>
+  );
+}
+
+interface KeyboardRowProps {
+  keys: KeyboardKey[];
+  pressedKeys: Set<string>;
+}
+
+function KeyboardRow({ keys, pressedKeys }: KeyboardRowProps) {
+  return (
+    <div className="flex gap-1">
+      {keys.map((keyData) => (
+        <Key key={keyData.code} keyData={keyData} isPressed={pressedKeys.has(keyData.code)} />
+      ))}
+    </div>
+  );
+}
 
 interface VirtualKeyboardProps {
   layout: LayoutType;
 }
 
 export function VirtualKeyboard({ layout }: VirtualKeyboardProps) {
-  const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
+  const [pressedKeys, setPressedKeys] = React.useState<Set<string>>(new Set());
   const currentConfig = KEYBOARD_CONFIGS[layout];
 
-  const handleKeyEvent = useCallback(
+  const handleKeyEvent = React.useCallback(
     (e: KeyboardEvent, action: 'press' | 'release') => {
       const mappedKeyCode = remapKey(e.code, 'qwerty', layout);
-
-      const isSpecialKey = Object.values(currentConfig).some((row) =>
+      const isSpecialKey = Object.values(currentConfig).some((row: KeyboardKey[]) =>
         row.some((key: KeyboardKey) => key.code === mappedKeyCode && key.isSpecial)
       );
 
@@ -35,7 +72,7 @@ export function VirtualKeyboard({ layout }: VirtualKeyboardProps) {
     [currentConfig, layout]
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => handleKeyEvent(e, 'press');
     const handleKeyUp = (e: KeyboardEvent) => handleKeyEvent(e, 'release');
 
