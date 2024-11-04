@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { cn } from '@/lib/utils';
 import { KEYBOARD_CONFIGS, remapKey, type KeyboardKey, type LayoutType } from '@/lib/keyboard';
 import { KeyboardRow } from './keyboard-row';
 
@@ -50,7 +49,7 @@ export function VirtualKeyboard({ layout }: VirtualKeyboardProps) {
   }, [handleKeyEvent]);
 
   return (
-    <div className="mx-auto w-fit space-y-1 rounded-lg border bg-card p-3 shadow-sm">
+    <div className="mx-auto w-fit space-y-1.5 rounded-lg border bg-card p-4 shadow-sm">
       {Object.entries(currentConfig).map(([rowKey, keys]) => (
         <KeyboardRow key={rowKey} keys={keys} pressedKeys={pressedKeys} />
       ))}

@@ -1,7 +1,6 @@
 export type KeyboardKey = {
   key: string;
   code: string;
-  width?: string;
   isSpecial?: boolean;
 };
 
@@ -33,10 +32,10 @@ export const QWERTY_LAYOUT: KeyboardLayout = {
     { key: '0', code: 'Digit0' },
     { key: '-', code: 'Minus' },
     { key: '=', code: 'Equal' },
-    { key: 'Backspace', code: 'Backspace', width: 'w-[2rem]', isSpecial: true },
+    { key: 'Backspace', code: 'Backspace', isSpecial: true },
   ],
   row2: [
-    { key: 'Tab', code: 'Tab', width: 'w-[1.5rem]', isSpecial: true },
+    { key: 'Tab', code: 'Tab', isSpecial: true },
     { key: 'Q', code: 'KeyQ' },
     { key: 'W', code: 'KeyW' },
     { key: 'E', code: 'KeyE' },
@@ -49,10 +48,10 @@ export const QWERTY_LAYOUT: KeyboardLayout = {
     { key: 'P', code: 'KeyP' },
     { key: '[', code: 'BracketLeft' },
     { key: ']', code: 'BracketRight' },
-    { key: '\\', code: 'Backslash', width: 'w-[1.5rem]' },
+    { key: '\\', code: 'Backslash' },
   ],
   row3: [
-    { key: 'Caps', code: 'CapsLock', width: 'w-[1.75rem]', isSpecial: true },
+    { key: 'Caps', code: 'CapsLock', isSpecial: true },
     { key: 'A', code: 'KeyA' },
     { key: 'S', code: 'KeyS' },
     { key: 'D', code: 'KeyD' },
@@ -64,10 +63,10 @@ export const QWERTY_LAYOUT: KeyboardLayout = {
     { key: 'L', code: 'KeyL' },
     { key: ';', code: 'Semicolon' },
     { key: "'", code: 'Quote' },
-    { key: 'Enter', code: 'Enter', width: 'w-[2.25rem]', isSpecial: true },
+    { key: 'Enter', code: 'Enter', isSpecial: true },
   ],
   row4: [
-    { key: 'Shift', code: 'ShiftLeft', width: 'w-[2.25rem]', isSpecial: true },
+    { key: 'Shift', code: 'ShiftLeft', isSpecial: true },
     { key: 'Z', code: 'KeyZ' },
     { key: 'X', code: 'KeyX' },
     { key: 'C', code: 'KeyC' },
@@ -78,14 +77,17 @@ export const QWERTY_LAYOUT: KeyboardLayout = {
     { key: ',', code: 'Comma' },
     { key: '.', code: 'Period' },
     { key: '/', code: 'Slash' },
-    { key: 'Shift', code: 'ShiftRight', width: 'w-[2.75rem]', isSpecial: true },
+    { key: 'Shift', code: 'ShiftRight', isSpecial: true },
   ],
   row5: [
-    { key: 'Ctrl', code: 'ControlLeft', width: 'w-[1.25rem]', isSpecial: true },
-    { key: 'Alt', code: 'AltLeft', width: 'w-[1.25rem]', isSpecial: true },
-    { key: 'Space', code: 'Space', width: 'w-[6.25rem]', isSpecial: true },
-    { key: 'Alt', code: 'AltRight', width: 'w-[1.25rem]', isSpecial: true },
-    { key: 'Ctrl', code: 'ControlRight', width: 'w-[1.25rem]', isSpecial: true },
+    { key: 'Ctrl', code: 'ControlLeft', isSpecial: true },
+    { key: 'Alt', code: 'AltLeft', isSpecial: true },
+    { key: 'Meta', code: 'MetaLeft', isSpecial: true },
+    { key: 'Space', code: 'Space' },
+    { key: 'Alt', code: 'AltRight', isSpecial: true },
+    { key: 'Meta', code: 'MetaRight', isSpecial: true },
+    { key: 'Fn', code: 'FnRight', isSpecial: true },
+    { key: 'Ctrl', code: 'ControlRight', isSpecial: true },
   ],
 };
 
@@ -93,7 +95,7 @@ export const QWERTY_LAYOUT: KeyboardLayout = {
 export const COLEMAK_LAYOUT: KeyboardLayout = {
   row1: QWERTY_LAYOUT.row1,
   row2: [
-    { key: 'Tab', code: 'Tab', width: 'w-[1.5rem]', isSpecial: true },
+    { key: 'Tab', code: 'Tab', isSpecial: true },
     { key: 'Q', code: 'KeyQ' },
     { key: 'W', code: 'KeyW' },
     { key: 'F', code: 'KeyF' },
@@ -106,10 +108,10 @@ export const COLEMAK_LAYOUT: KeyboardLayout = {
     { key: ';', code: 'Semicolon' },
     { key: '[', code: 'BracketLeft' },
     { key: ']', code: 'BracketRight' },
-    { key: '\\', code: 'Backslash', width: 'w-[1.5rem]' },
+    { key: '\\', code: 'Backslash' },
   ],
   row3: [
-    { key: 'Caps', code: 'CapsLock', width: 'w-[1.75rem]', isSpecial: true },
+    { key: 'Caps', code: 'CapsLock', isSpecial: true },
     { key: 'A', code: 'KeyA' },
     { key: 'R', code: 'KeyR' },
     { key: 'S', code: 'KeyS' },
@@ -121,10 +123,10 @@ export const COLEMAK_LAYOUT: KeyboardLayout = {
     { key: 'I', code: 'KeyI' },
     { key: 'O', code: 'KeyO' },
     { key: "'", code: 'Quote' },
-    { key: 'Enter', code: 'Enter', width: 'w-[2.25rem]', isSpecial: true },
+    { key: 'Enter', code: 'Enter', isSpecial: true },
   ],
   row4: [
-    { key: 'Shift', code: 'ShiftLeft', width: 'w-[2.25rem]', isSpecial: true },
+    { key: 'Shift', code: 'ShiftLeft', isSpecial: true },
     { key: 'Z', code: 'KeyZ' },
     { key: 'X', code: 'KeyX' },
     { key: 'C', code: 'KeyC' },
@@ -135,7 +137,7 @@ export const COLEMAK_LAYOUT: KeyboardLayout = {
     { key: ',', code: 'Comma' },
     { key: '.', code: 'Period' },
     { key: '/', code: 'Slash' },
-    { key: 'Shift', code: 'ShiftRight', width: 'w-[2.75rem]', isSpecial: true },
+    { key: 'Shift', code: 'ShiftRight', isSpecial: true },
   ],
   row5: QWERTY_LAYOUT.row5,
 };
