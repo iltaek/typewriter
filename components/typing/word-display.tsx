@@ -4,12 +4,21 @@ import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { type WordState, getRandomWords } from '@/lib/words';
 import { type LayoutType, remapKey, getCharacterFromKeyCode } from '@/lib/keyboard';
+import { match } from 'ts-pattern';
 
 const WORDS_COUNT = 10;
 
 interface WordDisplayProps {
   layout: LayoutType;
 }
+
+type ColorClass = 'text-green-500' | 'text-red-500' | 'text-gray-400';
+
+const CharacterColors = {
+  CORRECT: 'text-green-500',
+  INCORRECT: 'text-red-500',
+  PENDING: 'text-gray-400',
+} as const;
 
 export function WordDisplay({ layout }: WordDisplayProps) {
   const [words, setWords] = useState<WordState[]>([]);
@@ -37,16 +46,23 @@ export function WordDisplay({ layout }: WordDisplayProps) {
 
       if (e.key === 'Backspace') {
         e.preventDefault();
-        setWords((prev) => {
-          const newWords = [...prev];
-          const currentWord = { ...newWords[currentIndex] };
-          if (currentWord.typed.length > 0) {
-            currentWord.typed = currentWord.typed.slice(0, -1);
-            currentWord.isCorrect = currentWord.typed === currentWord.word;
-            newWords[currentIndex] = currentWord;
-          }
-          return newWords;
-        });
+        const currentWord = words[currentIndex];
+
+        if (currentWord.typed.length === 0 && currentIndex > 0) {
+          setCurrentIndex(currentIndex - 1);
+          return;
+        }
+
+        if (currentWord.typed.length > 0) {
+          setWords((prev) => {
+            const newWords = [...prev];
+            const updatedWord = { ...currentWord };
+            updatedWord.typed = updatedWord.typed.slice(0, -1);
+            updatedWord.isCorrect = updatedWord.typed === updatedWord.word;
+            newWords[currentIndex] = updatedWord;
+            return newWords;
+          });
+        }
         return;
       }
 
@@ -79,7 +95,7 @@ export function WordDisplay({ layout }: WordDisplayProps) {
           const currentWord = { ...newWords[currentIndex] };
           const newTyped = currentWord.typed + mappedChar;
 
-          if (newTyped.length <= currentWord.word.length) {
+          if (currentWord.word && newTyped.length <= currentWord.word.length) {
             currentWord.typed = newTyped;
             currentWord.isCorrect = currentWord.word.startsWith(newTyped);
             newWords[currentIndex] = currentWord;
@@ -103,26 +119,41 @@ export function WordDisplay({ layout }: WordDisplayProps) {
     };
   }, [currentIndex, words, isInitialized, layout]);
 
+  // 이전 단어의 색상을 결정하는 함수
+  const getPreviousWordColor = (wordState: WordState, charIndex: number): ColorClass => {
+    const typedChar = wordState.typed[charIndex];
+    const targetChar = wordState.word[charIndex];
+
+    if (typedChar === undefined) return CharacterColors.PENDING;
+    return typedChar === targetChar ? CharacterColors.CORRECT : CharacterColors.INCORRECT;
+  };
+
+  // 현재 문자의 색상을 결정하는 함수
+  const getCurrentCharacterColor = (
+    typedChar: string | undefined,
+    targetChar: string
+  ): ColorClass => {
+    if (typedChar === undefined) return CharacterColors.PENDING;
+    return typedChar === targetChar ? CharacterColors.CORRECT : CharacterColors.INCORRECT;
+  };
+
   const getCharacterColor = (
     wordState: WordState,
     index: number,
     charIndex: number,
-    char: string
-  ) => {
-    if (index !== currentIndex) {
-      if (index < currentIndex) {
-        return wordState.isCorrect ? 'text-green-500' : 'text-red-500';
-      }
-      return 'text-gray-400';
-    }
+    targetChar: string
+  ): ColorClass => {
+    const state = {
+      isCurrentWord: index === currentIndex,
+      isPreviousWord: index < currentIndex,
+    };
 
-    const typedChar = wordState.typed[charIndex];
-
-    if (typedChar === undefined) {
-      return 'text-gray-400';
-    }
-
-    return typedChar === char ? 'text-green-500' : 'text-red-500';
+    return match(state)
+      .with({ isCurrentWord: true }, () =>
+        getCurrentCharacterColor(wordState.typed[charIndex], targetChar)
+      )
+      .with({ isPreviousWord: true }, () => getPreviousWordColor(wordState, charIndex))
+      .otherwise(() => CharacterColors.PENDING);
   };
 
   return (
@@ -136,15 +167,15 @@ export function WordDisplay({ layout }: WordDisplayProps) {
                 index === currentIndex ? 'scale-110' : 'scale-100 opacity-50'
               )}
             >
-              {wordState.word.split('').map((char, charIndex) => (
+              {wordState.word.split('').map((targetChar, charIndex) => (
                 <span
-                  key={`${char}-${charIndex}`}
+                  key={`${targetChar}-${charIndex}`}
                   className={cn(
                     'transition-colors duration-150',
-                    getCharacterColor(wordState, index, charIndex, char)
+                    getCharacterColor(wordState, index, charIndex, targetChar)
                   )}
                 >
-                  {char}
+                  {targetChar}
                 </span>
               ))}
             </div>
