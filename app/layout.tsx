@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { GeistMono } from 'geist/font';
+import { ThemeProvider } from '@/components/providers/theme-provider';
+import { ThemeSwitch } from '@/components/ui/theme-switch';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -10,8 +12,16 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={GeistMono.className} suppressHydrationWarning>
-        {children}
+      <body className={GeistMono.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ThemeSwitch />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
