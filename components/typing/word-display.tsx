@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { type WordState, getRandomWords } from '@/lib/words';
-import { type LayoutType, remapKey, getCharacterFromKeyCode } from '@/lib/keyboard';
+import { type LayoutType, getCharacterFromKeyCode } from '@/lib/keyboard';
 import { match } from 'ts-pattern';
 
 const WORDS_COUNT = 10;
