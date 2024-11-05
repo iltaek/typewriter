@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { KEYBOARD_CONFIGS, remapKey, type KeyboardKey, type LayoutType } from '@/lib/keyboard';
 import { KeyboardRow } from './keyboard-row';
 
@@ -9,10 +9,10 @@ interface VirtualKeyboardProps {
 }
 
 export function VirtualKeyboard({ layout }: VirtualKeyboardProps) {
-  const [pressedKeys, setPressedKeys] = React.useState<Set<string>>(new Set());
+  const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
   const currentConfig = KEYBOARD_CONFIGS[layout];
 
-  const handleKeyEvent = React.useCallback(
+  const handleKeyEvent = useCallback(
     (e: KeyboardEvent, action: 'press' | 'release') => {
       const mappedKeyCode = remapKey(e.code, 'qwerty', layout);
 
@@ -35,7 +35,7 @@ export function VirtualKeyboard({ layout }: VirtualKeyboardProps) {
     [currentConfig, layout]
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => handleKeyEvent(e, 'press');
     const handleKeyUp = (e: KeyboardEvent) => handleKeyEvent(e, 'release');
 

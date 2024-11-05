@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, Fragment } from 'react';
 import { cn } from '@/lib/utils';
 import { type WordState, getRandomWords } from '@/lib/words';
 import { type LayoutType, getCharacterFromKeyCode } from '@/lib/keyboard';
@@ -160,7 +160,7 @@ export function WordDisplay({ layout }: WordDisplayProps) {
     <div className="flex flex-col items-center justify-center space-y-8">
       <div className="flex flex-wrap justify-center gap-x-1 max-w-3xl">
         {words.map((wordState, index) => (
-          <React.Fragment key={`${wordState.word}-${index}`}>
+          <Fragment key={`${wordState.word}-${index}`}>
             <div
               className={cn(
                 'text-2xl font-mono transition-all duration-200 px-1',
@@ -182,7 +182,7 @@ export function WordDisplay({ layout }: WordDisplayProps) {
             {index < words.length - 1 && (
               <span className="text-2xl font-mono text-gray-200">·</span>
             )}
-          </React.Fragment>
+          </Fragment>
         ))}
       </div>
 

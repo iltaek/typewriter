@@ -1,5 +1,5 @@
-import { createContext, useContext, useState } from 'react';
-import { type LayoutType } from '@/lib/keyboard';
+import { createContext, useContext, useState, type ReactNode } from 'react';
+import type { LayoutType } from '@/lib/keyboard';
 
 interface TypingContextType {
   layout: LayoutType;
@@ -16,7 +16,7 @@ export function useTypingContext() {
   return context;
 }
 
-export function TypingProvider({ children }: { children: React.ReactNode }) {
+export function TypingProvider({ children }: { children: ReactNode }) {
   const [layout, setLayout] = useState<LayoutType>('qwerty');
 
   return <TypingContext.Provider value={{ layout, setLayout }}>{children}</TypingContext.Provider>;
