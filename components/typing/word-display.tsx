@@ -1,163 +1,57 @@
 'use client';
 
-import { useEffect, useState, Fragment } from 'react';
+import { useEffect, Fragment, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { type WordState, getRandomWords } from '@/lib/words';
-import { type LayoutType, getCharacterFromKeyCode } from '@/lib/keyboard';
-import { match } from 'ts-pattern';
-
-const WORDS_COUNT = 10;
+import { type LayoutType } from '@/lib/keyboard';
+import { useTyping, type ColorClass } from '@/hooks/use-typing';
+import { TypingStatsDisplay } from './typing-stats';
 
 interface WordDisplayProps {
   layout: LayoutType;
 }
 
-type ColorClass = 'text-green-500' | 'text-red-500' | 'text-gray-400';
-
-const CharacterColors = {
-  CORRECT: 'text-green-500',
-  INCORRECT: 'text-red-500',
-  PENDING: 'text-gray-400',
-} as const;
-
 export function WordDisplay({ layout }: WordDisplayProps) {
-  const [words, setWords] = useState<WordState[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  const generateNewWords = () => {
-    return getRandomWords(WORDS_COUNT).map((word) => ({
-      word,
-      typed: '',
-      isCorrect: false,
-    }));
-  };
+  const [mounted, setMounted] = useState(false);
+  const {
+    words,
+    currentIndex,
+    stats,
+    isInitialized,
+    setIsInitialized,
+    handleKeyDown,
+    getCharacterColor,
+  } = useTyping();
 
   useEffect(() => {
-    if (!isInitialized) {
-      setWords(generateNewWords());
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isInitialized && mounted) {
       setIsInitialized(true);
     }
-  }, [isInitialized]);
+  }, [isInitialized, setIsInitialized, mounted]);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isInitialized) return;
+    if (!mounted) return;
 
-      if (e.key === 'Backspace') {
-        e.preventDefault();
-        const currentWord = words[currentIndex];
+    const handleKeyDownEvent = (e: KeyboardEvent) => handleKeyDown(e, layout);
+    const handleKeyPress = (e: KeyboardEvent) => e.preventDefault();
 
-        if (currentWord.typed.length === 0 && currentIndex > 0) {
-          setCurrentIndex(currentIndex - 1);
-          return;
-        }
-
-        if (currentWord.typed.length > 0) {
-          setWords((prev) => {
-            const newWords = [...prev];
-            const updatedWord = { ...currentWord };
-            updatedWord.typed = updatedWord.typed.slice(0, -1);
-            updatedWord.isCorrect = updatedWord.typed === updatedWord.word;
-            newWords[currentIndex] = updatedWord;
-            return newWords;
-          });
-        }
-        return;
-      }
-
-      if (e.key === ' ') {
-        e.preventDefault();
-        const currentWord = words[currentIndex];
-        const isWordComplete = currentWord.typed.length === currentWord.word.length;
-
-        if (isWordComplete) {
-          if (currentIndex === words.length - 1) {
-            setWords(generateNewWords());
-            setCurrentIndex(0);
-          } else {
-            setCurrentIndex((prev) => prev + 1);
-          }
-        }
-        return;
-      }
-
-      if (e.key.length === 1) {
-        e.preventDefault();
-
-        const mappedChar =
-          layout === 'qwerty' ? e.key : getCharacterFromKeyCode(e.code, layout, e.shiftKey);
-
-        if (!mappedChar) return;
-
-        setWords((prev) => {
-          const newWords = [...prev];
-          const currentWord = { ...newWords[currentIndex] };
-          const newTyped = currentWord.typed + mappedChar;
-
-          if (currentWord.word && newTyped.length <= currentWord.word.length) {
-            currentWord.typed = newTyped;
-            currentWord.isCorrect = currentWord.word.startsWith(newTyped);
-            newWords[currentIndex] = currentWord;
-          }
-
-          return newWords;
-        });
-      }
-    };
-
-    const handleKeyPress = (e: KeyboardEvent) => {
-      e.preventDefault();
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleKeyDownEvent);
     window.addEventListener('keypress', handleKeyPress);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDownEvent);
       window.removeEventListener('keypress', handleKeyPress);
     };
-  }, [currentIndex, words, isInitialized, layout]);
+  }, [handleKeyDown, layout, mounted]);
 
-  // 이전 단어의 색상을 결정하는 함수
-  const getPreviousWordColor = (wordState: WordState, charIndex: number): ColorClass => {
-    const typedChar = wordState.typed[charIndex];
-    const targetChar = wordState.word[charIndex];
-
-    if (typedChar === undefined) return CharacterColors.PENDING;
-    return typedChar === targetChar ? CharacterColors.CORRECT : CharacterColors.INCORRECT;
-  };
-
-  // 현재 문자의 색상을 결정하는 함수
-  const getCurrentCharacterColor = (
-    typedChar: string | undefined,
-    targetChar: string
-  ): ColorClass => {
-    if (typedChar === undefined) return CharacterColors.PENDING;
-    return typedChar === targetChar ? CharacterColors.CORRECT : CharacterColors.INCORRECT;
-  };
-
-  const getCharacterColor = (
-    wordState: WordState,
-    index: number,
-    charIndex: number,
-    targetChar: string
-  ): ColorClass => {
-    const state = {
-      isCurrentWord: index === currentIndex,
-      isPreviousWord: index < currentIndex,
-    };
-
-    return match(state)
-      .with({ isCurrentWord: true }, () =>
-        getCurrentCharacterColor(wordState.typed[charIndex], targetChar)
-      )
-      .with({ isPreviousWord: true }, () => getPreviousWordColor(wordState, charIndex))
-      .otherwise(() => CharacterColors.PENDING);
-  };
+  if (!mounted || !words) return null;
 
   return (
     <div className="flex flex-col items-center justify-center space-y-8">
+      <TypingStatsDisplay stats={stats} />
       <div className="flex flex-wrap justify-center gap-x-1 max-w-3xl">
         {words.map((wordState, index) => (
           <Fragment key={`${wordState.word}-${index}`}>
