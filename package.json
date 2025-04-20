@@ -20,16 +20,17 @@
     "lucide-react": "^0.454.0",
     "next": "14.2.16",
     "next-themes": "0.3.0",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
-    "ts-pattern": "^5.5.0"
+    "ts-pattern": "^5.5.0",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "^18.3.20",
+    "@types/react-dom": "^18.3.6",
     "autoprefixer": "^10.4.20",
     "eslint": "^8",
     "eslint-config-airbnb": "^19.0.4",

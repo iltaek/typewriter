@@ -1,60 +1,57 @@
 'use client';
 
-import { useEffect, Fragment } from 'react';
+import { useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { type LayoutType } from '@/lib/keyboard';
-import { useTyping } from '@/hooks/use-typing';
 import { TypingStatsDisplay } from './typing-stats';
+import { useTypingStore } from '@/store/typing-store';
+import { useLayoutStore } from '@/store/layout-store';
+import { Fragment } from 'react';
 
 /**
  * 타이핑 연습 단어 표시 영역의 Props 인터페이스입니다.
  */
 interface WordDisplayProps {
-  /** 현재 선택된 키보드 레이아웃 */
-  layout: LayoutType;
   /** 서버에서 생성된 초기 단어 목록 */
   initialWords: string[];
 }
 
 /**
  * 타이핑 연습을 위한 단어 목록을 표시하고 사용자 입력을 처리하는 메인 컴포넌트입니다.
- * `useTyping` 훅을 사용하여 타이핑 상태 관리 및 로직을 처리합니다.
- * @param layout - 현재 선택된 키보드 레이아웃 (입력 처리 시 사용됨)
+ * Zustand 스토어를 사용하여 타이핑 상태 관리 및 로직을 처리합니다.
  * @param initialWords - 표시할 초기 단어 목록
  */
-export function WordDisplay({ layout, initialWords }: WordDisplayProps) {
-  // useTyping 훅에 initialWords 전달
+export function WordDisplay({ initialWords }: WordDisplayProps) {
+  // Zustand 스토어에서 상태와 액션 가져오기
   const {
-    words, // 표시할 단어 상태 배열
-    currentIndex, // 현재 입력 중인 단어 인덱스
-    stats, // 타이핑 통계 (WPM, 정확도 등)
-    handleKeyDown, // 키 입력 처리 함수
-    getCharacterColor, // 글자 색상 결정 함수
-  } = useTyping({ initialWords });
+    words,
+    currentIndex,
+    stats,
+    getCharacterColor,
+    setInitialWords,
+    registerKeyboardListeners,
+    cleanup,
+  } = useTypingStore();
 
-  // 이벤트 리스너 등록 및 해제
+  // 컴포넌트 마운트 시 초기 단어 목록 설정
   useEffect(() => {
-    // 실제 키보드 입력 이벤트 핸들러
-    const handleKeyDownEvent = (e: KeyboardEvent) => handleKeyDown(e, layout);
-    // keypress 이벤트 기본 동작 방지 (필요성 재검토)
-    const handleKeyPress = (e: KeyboardEvent) => e.preventDefault();
+    // 초기 단어 목록 설정
+    setInitialWords(initialWords);
 
-    window.addEventListener('keydown', handleKeyDownEvent);
-    window.addEventListener('keypress', handleKeyPress);
+    // 이벤트 리스너 등록
+    registerKeyboardListeners();
 
-    // 클린업 함수: 컴포넌트 언마운트 시 리스너 제거
-    return () => {
-      window.removeEventListener('keydown', handleKeyDownEvent);
-      window.removeEventListener('keypress', handleKeyPress);
-    };
-  }, [handleKeyDown, layout]);
+    // 클린업 함수 반환
+    return cleanup;
+  }, [initialWords, setInitialWords, registerKeyboardListeners, cleanup]);
 
   // 단어 데이터가 없으면 로딩 상태 또는 null 반환
-  if (!words) return null; // 초기 상태가 [] 이므로 이 조건은 항상 false일 수 있음. 로딩 상태 분리 고려.
+  if (!words.length) return null;
 
   return (
     <div className="flex flex-col items-center justify-center space-y-8">
-      {/* 타이핑 통계 표시 컴포넌트 */} <TypingStatsDisplay stats={stats} />
+      {/* 타이핑 통계 표시 컴포넌트 */}
+      <TypingStatsDisplay stats={stats} />
+
       {/* 단어 목록 표시 영역 */}
       <div className="flex flex-wrap justify-center gap-x-1 max-w-3xl">
         {/* 단어 배열 순회 */}
@@ -72,7 +69,6 @@ export function WordDisplay({ layout, initialWords }: WordDisplayProps) {
               {/* 단어 내 글자들을 순회하며 span으로 렌더링 */}
               {wordState.word.split('').map((targetChar, charIndex) => (
                 <span
-                  // key prop 수정: charIndex 사용 (단어 내에서는 고유)
                   key={charIndex}
                   className={cn(
                     'transition-colors duration-150',
