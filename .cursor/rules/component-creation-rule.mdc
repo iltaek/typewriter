@@ -1,0 +1,7 @@
+---
+description: 컴포넌트 생성 규칙
+globs: 
+---
+## 컴포넌트 생성: ShadCN 우선 사용
+- **모든 UI 컴포넌트는 ShadCN을 사용하여 생성하세요.**
+ - **ShadCN 컴포넌트를 설치할때는 `npx shadcn@latest add [componentName]` 과 같은 명령어로 설치해주세요.**

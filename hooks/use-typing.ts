@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { type WordState, getRandomWords } from '@/lib/words';
 import { type TypingStats, calculateAccuracy, calculateWPM } from '@/lib/typing-stats';
 import { type LayoutType, getCharacterFromKeyCode } from '@/lib/keyboard';
@@ -13,9 +13,15 @@ const CharacterColors = {
   PENDING: 'text-gray-400',
 } as const;
 
-export function useTyping() {
+/** useTyping 훅의 Props 인터페이스 */
+interface UseTypingProps {
+  initialWords: string[]; // 서버에서 생성된 초기 단어 목록
+}
+
+export function useTyping({ initialWords }: UseTypingProps) {
+  // 상태 초기화 시 Props로 받은 initialWords 사용
   const [words, setWords] = useState<WordState[]>(() =>
-    getRandomWords(WORDS_COUNT).map((word) => ({
+    initialWords.map((word) => ({
       word,
       typed: '',
       isCorrect: false,
@@ -29,7 +35,6 @@ export function useTyping() {
     totalChars: 0,
   });
   const startTimeRef = useRef<number | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
 
   // 타이핑 통계 업데이트 함수
   const updateStats = useCallback((isCharCorrect: boolean) => {
@@ -54,7 +59,7 @@ export function useTyping() {
     });
   }, []);
 
-  // 새 단어 세트 생성 시 통계 초기화
+  // 새 단어 세트 생성 함수
   const generateNewWords = useCallback(() => {
     startTimeRef.current = null;
     setStats({
@@ -63,17 +68,17 @@ export function useTyping() {
       correctChars: 0,
       totalChars: 0,
     });
-    return getRandomWords(WORDS_COUNT).map((word) => ({
+    const newWords = getRandomWords(WORDS_COUNT).map((word) => ({
       word,
       typed: '',
       isCorrect: false,
     }));
+    setWords(newWords); // 상태 업데이트
+    setCurrentIndex(0); // 인덱스 초기화
   }, []);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent, layout: LayoutType) => {
-      if (!isInitialized) return;
-
       if (e.key === 'Backspace') {
         e.preventDefault();
         const currentWord = words[currentIndex];
@@ -99,12 +104,12 @@ export function useTyping() {
       if (e.key === ' ') {
         e.preventDefault();
         const currentWord = words[currentIndex];
+        if (!currentWord?.word) return;
         const isWordComplete = currentWord.typed.length === currentWord.word.length;
 
-        if (isWordComplete && currentWord.isCorrect) {
+        if (currentWord && isWordComplete && currentWord.isCorrect) {
           if (currentIndex === words.length - 1) {
-            setWords(generateNewWords());
-            setCurrentIndex(0);
+            generateNewWords();
           } else {
             setCurrentIndex((prev) => prev + 1);
           }
@@ -115,22 +120,23 @@ export function useTyping() {
       if (e.key.length === 1) {
         e.preventDefault();
 
-        const mappedChar =
-          layout === 'qwerty' ? e.key : getCharacterFromKeyCode(e.code, layout, e.shiftKey);
+        const mappedChar = getCharacterFromKeyCode(e.code, layout, e.shiftKey);
 
         if (!mappedChar) return;
 
         setWords((prev) => {
           const newWords = [...prev];
-          const currentWord = { ...newWords[currentIndex] };
+          const currentWordIndex = currentIndex;
+          if (!newWords[currentWordIndex]) return prev;
+
+          const currentWord = { ...newWords[currentWordIndex] };
           const newTyped = currentWord.typed + mappedChar;
 
           if (currentWord.word && newTyped.length <= currentWord.word.length) {
             currentWord.typed = newTyped;
             currentWord.isCorrect = currentWord.word.startsWith(newTyped);
-            newWords[currentIndex] = currentWord;
+            newWords[currentWordIndex] = currentWord;
 
-            // 타이핑 통계 업데이트
             const isCharCorrect = currentWord.word[currentWord.typed.length - 1] === mappedChar;
             updateStats(isCharCorrect);
           }
@@ -139,7 +145,7 @@ export function useTyping() {
         });
       }
     },
-    [currentIndex, words, isInitialized, generateNewWords, updateStats]
+    [currentIndex, words, generateNewWords, updateStats]
   );
 
   // 이전 단어의 색상을 결정하는 함수
@@ -181,8 +187,6 @@ export function useTyping() {
     words,
     currentIndex,
     stats,
-    isInitialized,
-    setIsInitialized,
     handleKeyDown,
     getCharacterColor,
   };

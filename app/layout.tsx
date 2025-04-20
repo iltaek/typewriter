@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           enableSystem
           disableTransitionOnChange
         >
-          <ThemeSwitch />
+          <ThemeSwitch className="fixed top-4 right-4 z-50" />
           {children}
         </ThemeProvider>
       </body>

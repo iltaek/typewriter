@@ -182,13 +182,36 @@ export const remapKey = (code: string, fromLayout: LayoutType, toLayout: LayoutT
   return mapping[code] || code;
 };
 
-// 키 코드에 해당하는 문자 반환
+// 키 코드에 해당하는 문자 반환 (수정됨)
 export const getCharacterFromKeyCode = (
-  code: string,
+  code: string, // 물리적 키 코드 (예: KeyE)
   layout: LayoutType,
   isShift: boolean = false
 ): string => {
-  const keyMappings: Record<string, [string, string]> = {
+  // QWERTY 기준 키 매핑 (확장됨) - 논리적 키 코드 -> 문자 매핑으로 사용
+  const qwertyKeyMappings: Record<string, [string, string]> = {
+    Backquote: ['`', '~'],
+    Digit1: ['1', '!'],
+    Digit2: ['2', '@'],
+    Digit3: ['3', '#'],
+    Digit4: ['4', '$'],
+    Digit5: ['5', '%'],
+    Digit6: ['6', '^'],
+    Digit7: ['7', '&'],
+    Digit8: ['8', '*'],
+    Digit9: ['9', '('],
+    Digit0: ['0', ')'],
+    Minus: ['-', '_'],
+    Equal: ['=', '+'],
+    BracketLeft: ['[', '{'],
+    BracketRight: [']', '}'],
+    Backslash: ['\\', '|'],
+    Semicolon: [';', ':'],
+    Quote: ["'", '"'],
+    Comma: [',', '<'],
+    Period: ['.', '>'],
+    Slash: ['/', '?'],
+    Space: [' ', ' '],
     KeyA: ['a', 'A'],
     KeyB: ['b', 'B'],
     KeyC: ['c', 'C'],
@@ -215,9 +238,33 @@ export const getCharacterFromKeyCode = (
     KeyX: ['x', 'X'],
     KeyY: ['y', 'Y'],
     KeyZ: ['z', 'Z'],
-    Semicolon: [';', ':'],
   };
 
-  const mappedCode = layout === 'colemak' ? remapKey(code, 'qwerty', 'colemak') : code;
-  return keyMappings[mappedCode]?.[isShift ? 1 : 0] || '';
+  // 1. 물리적으로 눌린 키가 특수 키인지 확인
+  const layoutConfig = KEYBOARD_CONFIGS[layout];
+  let physicalKeyData: KeyboardKey | undefined;
+  for (const row of Object.values(layoutConfig)) {
+    physicalKeyData = row.find((key) => key.code === code);
+    if (physicalKeyData) break;
+  }
+  // 특수 키(Shift, Ctrl 등)이면 빈 문자열 반환 (스페이스는 제외)
+  if (physicalKeyData?.isSpecial) {
+    return '';
+  }
+  // 스페이스바는 여기서 처리
+  if (code === 'Space') return ' ';
+
+  // 2. 선택된 레이아웃의 논리적 키 코드 결정
+  const logicalCode = layout === 'colemak' ? remapKey(code, 'qwerty', 'colemak') : code;
+
+  // 3. 논리적 키 코드를 사용하여 문자 매핑 찾기
+  const keyMapEntry = qwertyKeyMappings[logicalCode];
+
+  // 4. 매핑된 문자가 없으면 빈 문자열 반환
+  if (!keyMapEntry) {
+    return '';
+  }
+
+  // 5. Shift 상태에 따라 올바른 문자 반환
+  return keyMapEntry[isShift ? 1 : 0];
 };
