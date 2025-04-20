@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { type WordState } from '@/schemas/word.schema';
 
@@ -30,7 +29,7 @@ export function Word({ word, isActive, isPrevious }: WordProps) {
         // 기본 스타일 및 전환 효과
         'text-2xl font-mono transition-all duration-200 px-1',
         // 활성 상태에 따른 스타일 (크기, 투명도)
-        isActive ? 'scale-110' : 'scale-100 opacity-50'
+        isActive ? 'scale-110' : 'scale-100 opacity-50',
       )}
     >
       {/* 단어의 글자들을 순회하며 span으로 렌더링 */}
@@ -48,7 +47,7 @@ export function Word({ word, isActive, isPrevious }: WordProps) {
                   : 'text-red-500'), // 입력된 글자가 오타일 경우 (테마의 destructive 색상 사용 고려)
             isPrevious && // 이전에 입력했던 단어일 경우
               (word.isCorrect ? 'text-green-500' : 'text-red-500'), // 단어 전체 정타/오타 여부에 따라 색상 적용
-            !isActive && !isPrevious && 'text-gray-400' // 활성/이전 단어가 아닌 경우 기본 색상
+            !isActive && !isPrevious && 'text-gray-400', // 활성/이전 단어가 아닌 경우 기본 색상
           )}
         >
           {char}

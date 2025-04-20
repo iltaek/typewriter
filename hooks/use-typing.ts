@@ -1,12 +1,13 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { getRandomWords } from '@/lib/words';
-import { calculateAccuracy, calculateWPM } from '@/lib/typing-stats';
+
 import { getCharacterFromKeyCode } from '@/lib/keyboard';
+import { calculateAccuracy, calculateWPM } from '@/lib/typing-stats';
+import { getRandomWords } from '@/lib/words';
+import { type ColorClass, CHARACTER_COLORS } from '@/schemas/common.schema';
 import { type LayoutType } from '@/schemas/keyboard.schema';
-import { type WordState } from '@/schemas/word.schema';
 import { type TypingStats } from '@/schemas/typing.schema';
 import { WORDS_COUNT } from '@/schemas/typing.schema';
-import { type ColorClass, CHARACTER_COLORS } from '@/schemas/common.schema';
+import { type WordState } from '@/schemas/word.schema';
 
 /** useTyping 훅의 Props 인터페이스 */
 interface UseTypingProps {

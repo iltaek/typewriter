@@ -1,12 +1,14 @@
 import { create } from 'zustand';
+
 import { getCharacterFromKeyCode } from '@/lib/keyboard';
-import { getRandomWords } from '@/lib/words';
 import { calculateAccuracy, calculateWPM } from '@/lib/typing-stats';
+import { getRandomWords } from '@/lib/words';
+import { type ColorClass, CHARACTER_COLORS } from '@/schemas/common.schema';
 import { type TypingStats, WORDS_COUNT } from '@/schemas/typing.schema';
 import { type WordState } from '@/schemas/word.schema';
-import { type ColorClass, CHARACTER_COLORS } from '@/schemas/common.schema';
-import { useLayoutStore } from './layout-store';
+
 import { useKeyboardStore } from './keyboard-store';
+import { useLayoutStore } from './layout-store';
 
 // 타이핑 스토어 상태 인터페이스
 interface TypingState {
@@ -128,7 +130,7 @@ export const useTypingStore = create<TypingState>()((set, get) => {
     // 키 다운 이벤트 처리
     handleTypingKeyDown: (e: KeyboardEvent) => {
       const { words, currentIndex, updateStats, generateNewWords } = get();
-      const layout = useLayoutStore.getState().layout;
+      const { layout } = useLayoutStore.getState();
 
       // 현재 입력 중인 단어
       const currentWord = words[currentIndex];

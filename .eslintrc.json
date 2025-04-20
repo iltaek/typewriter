@@ -22,10 +22,16 @@
     "react/require-default-props": "off",
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/no-explicit-any": "warn",
-    "comma-dangle": ["error", "always-multiline"],
+    "comma-dangle": ["warn", "always-multiline"],
     "import/prefer-default-export": "off",
+    "react/no-array-index-key": "off",
+    "no-nested-ternary": "off",
+    "no-plusplus": "off",
+    "@typescript-eslint/no-use-before-define": "warn",
+    "@typescript-eslint/no-shadow": "warn",
+    "no-restricted-syntax": "warn",
     "import/order": [
-      "error",
+      "warn",
       {
         "groups": ["builtin", "external", "internal", ["parent", "sibling"], "index"],
         "newlines-between": "always",
@@ -51,7 +57,11 @@
       "version": "detect"
     },
     "import/resolver": {
-      "typescript": {}
-    }
+      "typescript": {},
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    },
+    "ignorePatterns": ["postcss.config.js", "tailwind.config.js"]
   }
 }

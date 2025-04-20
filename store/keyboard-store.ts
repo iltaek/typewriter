@@ -1,5 +1,7 @@
 import { create } from 'zustand';
+
 import { remapKey, getCharacterFromKeyCode } from '@/lib/keyboard';
+
 import { useLayoutStore } from './layout-store';
 
 // 키보드 스토어 상태 인터페이스
@@ -28,7 +30,7 @@ export const useKeyboardStore = create<KeyboardState>()((set, get) => ({
   // 키 다운 이벤트 처리
   handleKeyDown: (e: KeyboardEvent) => {
     // 현재 선택된 레이아웃 가져오기
-    const layout = useLayoutStore.getState().layout;
+    const { layout } = useLayoutStore.getState();
 
     // 특수 키 조합 무시 (Alt, Ctrl, Meta(Command))
     if (e.altKey || e.ctrlKey || e.metaKey) return;
@@ -59,7 +61,7 @@ export const useKeyboardStore = create<KeyboardState>()((set, get) => ({
   // 키 업 이벤트 처리
   handleKeyUp: (e: KeyboardEvent) => {
     // 현재 선택된 레이아웃 가져오기
-    const layout = useLayoutStore.getState().layout;
+    const { layout } = useLayoutStore.getState();
 
     // 물리적 키 코드를 현재 레이아웃에 맞게 변환
     const mappedKeyCode = remapKey(e.code, 'qwerty', layout);

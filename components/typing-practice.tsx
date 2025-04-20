@@ -1,8 +1,8 @@
 'use client';
 
-import { WordDisplay } from '@/components/typing/word-display';
 import { VirtualKeyboard } from '@/components/keyboard';
 import { LayoutSelector } from '@/components/layout-selector';
+import { WordDisplay } from '@/components/typing/word-display';
 
 interface TypingPracticeProps {
   initialWords: string[];

@@ -1,9 +1,12 @@
-import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
-import { GeistMono } from 'geist/font/mono';
+import { Inter } from 'next/font/google';
+import type { ReactNode } from 'react';
+
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { ThemeSwitch } from '@/components/ui/theme-switch';
 import './globals.css';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'TypeWriter',
@@ -13,7 +16,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={GeistMono.className}>
+      <body className={inter.className}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

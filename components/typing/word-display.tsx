@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect } from 'react';
+import { Fragment, useEffect } from 'react';
+
 import { cn } from '@/lib/utils';
-import { TypingStatsDisplay } from './typing-stats';
 import { useTypingStore } from '@/store/typing-store';
-import { useLayoutStore } from '@/store/layout-store';
-import { Fragment } from 'react';
+
+import { TypingStatsDisplay } from './typing-stats';
 
 /**
  * 타이핑 연습 단어 표시 영역의 Props 인터페이스입니다.
@@ -63,7 +63,7 @@ export function WordDisplay({ initialWords }: WordDisplayProps) {
               className={cn(
                 'text-2xl font-mono transition-all duration-200 px-1',
                 // 현재 입력 중인 단어는 강조 (크기 확대)
-                index === currentIndex ? 'scale-110' : 'scale-100 opacity-50'
+                index === currentIndex ? 'scale-110' : 'scale-100 opacity-50',
               )}
             >
               {/* 단어 내 글자들을 순회하며 span으로 렌더링 */}
@@ -73,7 +73,7 @@ export function WordDisplay({ initialWords }: WordDisplayProps) {
                   className={cn(
                     'transition-colors duration-150',
                     // 글자 상태(정타, 오타, 입력 전)에 따라 색상 적용
-                    getCharacterColor(wordState, index, charIndex, targetChar)
+                    getCharacterColor(wordState, index, charIndex, targetChar),
                   )}
                 >
                   {targetChar}

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+
 import { type LayoutType } from '@/schemas/keyboard.schema';
 
 // 레이아웃 스토어 상태 인터페이스

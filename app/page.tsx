@@ -1,5 +1,5 @@
-import { getRandomWords } from '@/lib/words';
 import TypingPractice from '@/components/typing-practice';
+import { getRandomWords } from '@/lib/words';
 
 const WORDS_COUNT = 10;
 

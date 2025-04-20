@@ -2,10 +2,12 @@
 
 import * as React from 'react';
 import { useEffect } from 'react';
+
 import { KEYBOARD_CONFIGS } from '@/lib/keyboard';
-import { KeyboardRow } from './keyboard-row';
-import { useLayoutStore } from '@/store/layout-store';
 import { useKeyboardStore } from '@/store/keyboard-store';
+import { useLayoutStore } from '@/store/layout-store';
+
+import { KeyboardRow } from './keyboard-row';
 
 /**
  * 화면에 가상 키보드를 표시하고, 물리적 키보드 입력에 따라 해당 키의 눌림 상태를 시각적으로 반영하는 컴포넌트입니다.

@@ -1,9 +1,4 @@
-import {
-  type KeyboardKey,
-  type KeyboardLayout,
-  type LayoutType,
-  type KeyMap,
-} from '@/schemas/keyboard.schema';
+import { type KeyboardLayout, type KeyMap, type LayoutType } from '@/schemas/keyboard.schema';
 
 // QWERTY 레이아웃 정의
 export const QWERTY_LAYOUT: KeyboardLayout = {
@@ -160,7 +155,7 @@ export const QWERTY_TO_COLEMAK: KeyMap = {
 
 // Colemak에서 QWERTY로의 매핑
 export const COLEMAK_TO_QWERTY: KeyMap = Object.fromEntries(
-  Object.entries(QWERTY_TO_COLEMAK).map(([key, value]) => [value, key])
+  Object.entries(QWERTY_TO_COLEMAK).map(([key, value]) => [value, key]),
 );
 
 // 키 매핑 함수
@@ -175,7 +170,7 @@ export const remapKey = (code: string, fromLayout: LayoutType, toLayout: LayoutT
 export const getCharacterFromKeyCode = (
   code: string, // 물리적 키 코드 (예: KeyE)
   layout: LayoutType,
-  isShift: boolean = false
+  isShift: boolean = false,
 ): string => {
   // QWERTY 기준 키 매핑 (확장됨) - 논리적 키 코드 -> 문자 매핑으로 사용
   const qwertyKeyMappings: Record<string, [string, string]> = {
@@ -231,11 +226,12 @@ export const getCharacterFromKeyCode = (
 
   // 1. 물리적으로 눌린 키가 특수 키인지 확인
   const layoutConfig = KEYBOARD_CONFIGS[layout];
-  let physicalKeyData: KeyboardKey | undefined;
-  for (const row of Object.values(layoutConfig)) {
-    physicalKeyData = row.find((key) => key.code === code);
-    if (physicalKeyData) break;
-  }
+
+  // for...of 구문을 find 메서드로 리팩토링
+  const physicalKeyData = Object.values(layoutConfig)
+    .flatMap((row) => row)
+    .find((key) => key.code === code);
+
   // 특수 키(Shift, Ctrl 등)이면 빈 문자열 반환 (스페이스는 제외)
   if (physicalKeyData?.isSpecial) {
     return '';

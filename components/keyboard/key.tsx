@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import { cn } from '@/lib/utils';
 import { type KeyboardKey } from '@/schemas/keyboard.schema';
 
@@ -69,7 +70,7 @@ export const Key = React.memo(function Key({
           ? 'bg-primary text-primary-foreground' // 눌렸을 때
           : 'bg-background hover:bg-accent hover:text-accent-foreground', // 기본 상태
         // 특수 키 여부에 따른 스타일 변경
-        keyData.isSpecial ? 'text-xs text-muted-foreground' : 'text-sm font-medium'
+        keyData.isSpecial ? 'text-xs text-muted-foreground' : 'text-sm font-medium',
       )}
     >
       {/* 키에 표시될 문자 */} {keyData.key}

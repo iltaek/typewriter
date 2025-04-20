@@ -1,10 +1,12 @@
 'use client';
 
-import * as React from 'react';
-import { Moon, Sun, Monitor } from 'lucide-react';
+import { Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { Button } from './button';
+import * as React from 'react';
+
 import { cn } from '@/lib/utils';
+
+import { Button } from './button';
 
 /**
  * 라이트 모드, 다크 모드, 시스템 설정을 전환하는 버튼 컴포넌트입니다.
@@ -42,19 +44,19 @@ export function ThemeSwitch({ className }: { className?: string }) {
           'h-[1.2rem] w-[1.2rem] transition-all',
           resolvedTheme === 'light' && theme === 'light'
             ? 'rotate-0 scale-100'
-            : 'rotate-90 scale-0'
+            : 'rotate-90 scale-0',
         )}
       />
       <Moon
         className={cn(
           'absolute h-[1.2rem] w-[1.2rem] transition-all',
-          resolvedTheme === 'dark' && theme === 'dark' ? 'rotate-0 scale-100' : 'rotate-90 scale-0'
+          resolvedTheme === 'dark' && theme === 'dark' ? 'rotate-0 scale-100' : 'rotate-90 scale-0',
         )}
       />
       <Monitor
         className={cn(
           'absolute h-[1.2rem] w-[1.2rem] transition-all',
-          theme === 'system' ? 'rotate-0 scale-100' : 'rotate-90 scale-0'
+          theme === 'system' ? 'rotate-0 scale-100' : 'rotate-90 scale-0',
         )}
       />
       <span className="sr-only">Toggle theme (currently {theme})</span>
