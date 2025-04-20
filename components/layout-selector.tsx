@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { type LayoutType } from '@/lib/keyboard';
+import { type LayoutType } from '@/schemas/keyboard.schema';
 import { Button } from '@/components/ui/button';
 import { useLayoutStore } from '@/store/layout-store';
 

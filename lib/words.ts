@@ -1,3 +1,5 @@
+import { type WordState, validateWordState, validateWordStates } from '@/schemas/word.schema';
+
 // 무작위로 n개의 단어를 선택하는 유틸리티 함수
 export const getRandomWords = (count: number): string[] => {
   const words = [...PRACTICE_WORDS];
@@ -13,12 +15,8 @@ export const getRandomWords = (count: number): string[] => {
   return result;
 };
 
-// 단어 상태를 추적하기 위한 타입
-export interface WordState {
-  word: string;
-  typed: string;
-  isCorrect: boolean;
-}
+// 단어 상태에 대한 유효성 검증 함수 (스키마에서 가져온 함수 재내보내기)
+export { validateWordState, validateWordStates };
 
 // 연습용 단어 배열
 export const PRACTICE_WORDS = [

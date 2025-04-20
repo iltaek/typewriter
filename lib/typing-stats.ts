@@ -1,10 +1,4 @@
-export interface TypingStats {
-  accuracy: number; // 정확도 (%)
-  wpm: number; // 분당 단어 수 (WPM)
-  correctChars: number; // 올바르게 입력한 문자 수
-  totalChars: number; // 전체 입력한 문자 수
-  startTime?: number; // 타이핑 시작 시간
-}
+import { type TypingStats } from '@/schemas/typing.schema';
 
 export function calculateAccuracy(correctChars: number, totalChars: number): number {
   if (totalChars === 0) return 0;

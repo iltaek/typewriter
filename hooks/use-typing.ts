@@ -1,17 +1,11 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { type WordState, getRandomWords } from '@/lib/words';
-import { type TypingStats, calculateAccuracy, calculateWPM } from '@/lib/typing-stats';
-import { type LayoutType, getCharacterFromKeyCode } from '@/lib/keyboard';
-
-const WORDS_COUNT = 10;
-
-export type ColorClass = 'text-green-500' | 'text-red-500' | 'text-gray-400';
-
-const CharacterColors = {
-  CORRECT: 'text-green-500',
-  INCORRECT: 'text-red-500',
-  PENDING: 'text-gray-400',
-} as const;
+import { getRandomWords } from '@/lib/words';
+import { calculateAccuracy, calculateWPM } from '@/lib/typing-stats';
+import { getCharacterFromKeyCode } from '@/lib/keyboard';
+import { type LayoutType } from '@/schemas/keyboard.schema';
+import { type WordState } from '@/schemas/word.schema';
+import { type TypingStats } from '@/schemas/typing.schema';
+import { type ColorClass, CHARACTER_COLORS, WORDS_COUNT } from '@/constants/typing';
 
 /** useTyping 훅의 Props 인터페이스 */
 interface UseTypingProps {
@@ -154,8 +148,8 @@ export function useTyping({ initialWords }: UseTypingProps) {
       const typedChar = wordState.typed[charIndex];
       const targetChar = wordState.word[charIndex];
 
-      if (typedChar === undefined) return CharacterColors.PENDING;
-      return typedChar === targetChar ? CharacterColors.CORRECT : CharacterColors.INCORRECT;
+      if (typedChar === undefined) return CHARACTER_COLORS.PENDING;
+      return typedChar === targetChar ? CHARACTER_COLORS.CORRECT : CHARACTER_COLORS.INCORRECT;
     },
     []
   );
@@ -163,8 +157,8 @@ export function useTyping({ initialWords }: UseTypingProps) {
   // 현재 문자의 색상을 결정하는 함수
   const getCurrentCharacterColor = useCallback(
     (typedChar: string | undefined, targetChar: string): ColorClass => {
-      if (typedChar === undefined) return CharacterColors.PENDING;
-      return typedChar === targetChar ? CharacterColors.CORRECT : CharacterColors.INCORRECT;
+      if (typedChar === undefined) return CHARACTER_COLORS.PENDING;
+      return typedChar === targetChar ? CHARACTER_COLORS.CORRECT : CHARACTER_COLORS.INCORRECT;
     },
     []
   );
@@ -178,7 +172,7 @@ export function useTyping({ initialWords }: UseTypingProps) {
       if (index < currentIndex) {
         return getPreviousWordColor(wordState, charIndex);
       }
-      return CharacterColors.PENDING;
+      return CHARACTER_COLORS.PENDING;
     },
     [currentIndex, getCurrentCharacterColor, getPreviousWordColor]
   );

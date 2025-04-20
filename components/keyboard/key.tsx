@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { type KeyboardKey } from '@/lib/keyboard';
+import { type KeyboardKey } from '@/schemas/keyboard.schema';
 
 /** 키 코드별 너비 클래스를 정의하는 상수 */
 const KEY_WIDTH_CLASSES: Record<string, string> = {

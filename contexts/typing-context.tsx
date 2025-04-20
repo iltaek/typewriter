@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import type { LayoutType } from '@/lib/keyboard';
+import { type LayoutType } from '@/schemas/keyboard.schema';
 
 interface TypingContextType {
   layout: LayoutType;

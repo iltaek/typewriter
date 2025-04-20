@@ -1,8 +1,10 @@
 import { create } from 'zustand';
 import { getCharacterFromKeyCode } from '@/lib/keyboard';
-import { type WordState, getRandomWords } from '@/lib/words';
-import { type TypingStats, calculateAccuracy, calculateWPM } from '@/lib/typing-stats';
-import { type ColorClass, CharacterColors, WORDS_COUNT } from '@/constants/typing';
+import { getRandomWords } from '@/lib/words';
+import { calculateAccuracy, calculateWPM } from '@/lib/typing-stats';
+import { type TypingStats } from '@/schemas/typing.schema';
+import { type WordState } from '@/schemas/word.schema';
+import { type ColorClass, CHARACTER_COLORS, WORDS_COUNT } from '@/constants/typing';
 import { useLayoutStore } from './layout-store';
 import { useKeyboardStore } from './keyboard-store';
 
@@ -215,14 +217,14 @@ export const useTypingStore = create<TypingState>()((set, get) => {
       const typedChar = wordState.typed[charIndex];
       const targetChar = wordState.word[charIndex];
 
-      if (typedChar === undefined) return CharacterColors.PENDING;
-      return typedChar === targetChar ? CharacterColors.CORRECT : CharacterColors.INCORRECT;
+      if (typedChar === undefined) return CHARACTER_COLORS.PENDING;
+      return typedChar === targetChar ? CHARACTER_COLORS.CORRECT : CHARACTER_COLORS.INCORRECT;
     },
 
     // 현재 입력 중인 단어의 글자 색상 결정
     getCurrentCharacterColor: (typedChar: string | undefined, targetChar: string): ColorClass => {
-      if (typedChar === undefined) return CharacterColors.PENDING;
-      return typedChar === targetChar ? CharacterColors.CORRECT : CharacterColors.INCORRECT;
+      if (typedChar === undefined) return CHARACTER_COLORS.PENDING;
+      return typedChar === targetChar ? CHARACTER_COLORS.CORRECT : CHARACTER_COLORS.INCORRECT;
     },
 
     // 글자 색상 결정 통합 함수
@@ -240,7 +242,7 @@ export const useTypingStore = create<TypingState>()((set, get) => {
       if (index < currentIndex) {
         return getPreviousWordColor(wordState, charIndex);
       }
-      return CharacterColors.PENDING;
+      return CHARACTER_COLORS.PENDING;
     },
 
     // 키보드 이벤트 리스너 등록 및 핸들러 설정

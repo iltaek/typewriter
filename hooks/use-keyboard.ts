@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
-import { type LayoutType, remapKey, getCharacterFromKeyCode } from '@/lib/keyboard';
+import { remapKey, getCharacterFromKeyCode } from '@/lib/keyboard';
+import { type LayoutType } from '@/schemas/keyboard.schema';
 
 interface UseKeyboardProps {
   layout: LayoutType;

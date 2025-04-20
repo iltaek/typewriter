@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
-import { type WordState } from '@/lib/words';
+import { type WordState } from '@/schemas/word.schema';
 
 /**
  * 타이핑 연습에서 개별 단어를 표시하는 컴포넌트의 Props 인터페이스입니다.
@@ -34,7 +34,7 @@ export function Word({ word, isActive, isPrevious }: WordProps) {
       )}
     >
       {/* 단어의 글자들을 순회하며 span으로 렌더링 */}
-      {word.word.split('').map((char, charIndex) => (
+      {word.word.split('').map((char: string, charIndex: number) => (
         <span
           key={`${char}-${charIndex}`} // key prop 개선 필요 (charIndex 사용)
           className={cn(

@@ -1,20 +1,9 @@
-export type KeyboardKey = {
-  key: string;
-  code: string;
-  isSpecial?: boolean;
-};
-
-export type KeyboardLayout = {
-  row1: KeyboardKey[];
-  row2: KeyboardKey[];
-  row3: KeyboardKey[];
-  row4: KeyboardKey[];
-  row5: KeyboardKey[];
-};
-
-export type LayoutType = 'qwerty' | 'colemak';
-
-export type KeyMap = Record<string, string>;
+import {
+  type KeyboardKey,
+  type KeyboardLayout,
+  type LayoutType,
+  type KeyMap,
+} from '@/schemas/keyboard.schema';
 
 // QWERTY 레이아웃 정의
 export const QWERTY_LAYOUT: KeyboardLayout = {
