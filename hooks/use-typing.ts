@@ -5,7 +5,8 @@ import { getCharacterFromKeyCode } from '@/lib/keyboard';
 import { type LayoutType } from '@/schemas/keyboard.schema';
 import { type WordState } from '@/schemas/word.schema';
 import { type TypingStats } from '@/schemas/typing.schema';
-import { type ColorClass, CHARACTER_COLORS, WORDS_COUNT } from '@/constants/typing';
+import { WORDS_COUNT } from '@/schemas/typing.schema';
+import { type ColorClass, CHARACTER_COLORS } from '@/schemas/common.schema';
 
 /** useTyping 훅의 Props 인터페이스 */
 interface UseTypingProps {

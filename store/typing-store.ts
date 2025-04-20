@@ -2,9 +2,9 @@ import { create } from 'zustand';
 import { getCharacterFromKeyCode } from '@/lib/keyboard';
 import { getRandomWords } from '@/lib/words';
 import { calculateAccuracy, calculateWPM } from '@/lib/typing-stats';
-import { type TypingStats } from '@/schemas/typing.schema';
+import { type TypingStats, WORDS_COUNT } from '@/schemas/typing.schema';
 import { type WordState } from '@/schemas/word.schema';
-import { type ColorClass, CHARACTER_COLORS, WORDS_COUNT } from '@/constants/typing';
+import { type ColorClass, CHARACTER_COLORS } from '@/schemas/common.schema';
 import { useLayoutStore } from './layout-store';
 import { useKeyboardStore } from './keyboard-store';
 
