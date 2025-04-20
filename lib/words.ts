@@ -1,4 +1,4 @@
-import { type WordState, validateWordState, validateWordStates } from '@/schemas/word.schema';
+import { validateWordState, validateWordStates } from '@/schemas/word.schema';
 
 // 무작위로 n개의 단어를 선택하는 유틸리티 함수
 export const getRandomWords = (count: number): string[] => {
