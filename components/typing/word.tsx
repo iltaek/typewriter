@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { type WordState } from '@/schemas/word.schema';
+import { type WordState } from '@/types/word.types';
 
 /**
  * 타이핑 연습에서 개별 단어를 표시하는 컴포넌트의 Props 인터페이스입니다.

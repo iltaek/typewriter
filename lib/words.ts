@@ -1,5 +1,4 @@
 import wordsData from '@/data/words.json';
-import { validateWordState, validateWordStates } from '@/schemas/word.schema';
 
 /**
  * 타이핑 연습용 단어 목록
@@ -25,6 +24,3 @@ export const getRandomWords = (count: number): string[] => {
 
   return result;
 };
-
-// 단어 상태에 대한 유효성 검증 함수 (스키마에서 가져온 함수 재내보내기)
-export { validateWordState, validateWordStates };

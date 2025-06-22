@@ -1,4 +1,4 @@
-import { type KeyboardLayout, type KeyMap, type LayoutType } from '@/schemas/keyboard.schema';
+import { type KeyboardLayout, type KeyMap, type LayoutType } from '@/types/keyboard.types';
 
 import { QWERTY_KEY_MAPPINGS } from './keyboard-mappings';
 

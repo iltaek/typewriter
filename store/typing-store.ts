@@ -3,9 +3,9 @@ import { create } from 'zustand';
 import { getCharacterFromKeyCode } from '@/lib/keyboard';
 import { calculateAccuracy, calculateWPM } from '@/lib/typing-stats';
 import { getRandomWords } from '@/lib/words';
-import { type ColorClass, CHARACTER_COLORS } from '@/schemas/common.schema';
-import { type TypingStats, WORDS_COUNT } from '@/schemas/typing.schema';
-import { type WordState } from '@/schemas/word.schema';
+import { type ColorClass, CHARACTER_COLORS } from '@/types/common.types';
+import { type TypingStats, WORDS_COUNT } from '@/types/typing.types';
+import { type WordState } from '@/types/word.types';
 
 import { useKeyboardStore } from './keyboard-store';
 import { useLayoutStore } from './layout-store';
