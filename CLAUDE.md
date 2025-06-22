@@ -4,75 +4,131 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-TypeWriter is a Next.js 14 typing practice application built with TypeScript, TailwindCSS, and shadcn/ui components. It features real-time typing statistics, virtual keyboard display, and theme switching.
+TypeWriter is a typing practice web application built with Next.js 14, TypeScript, TailwindCSS, and Zustand. It features real-time typing statistics, virtual keyboard visualization, and support for multiple keyboard layouts (QWERTY, Dvorak, Colemak).
 
-## Essential Commands
+## Development Commands
 
-### Development
+### Build and Development
 
-```bash
-npm run dev          # Start development server (http://localhost:3000)
-npm run build        # Production build
-npm run start        # Start production server
+- `npm run dev` - Start development server on localhost:3000
+- `npm run build` - Build production application
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint code linting
+- `npm run lint:fix` - Run ESLint with auto-fix
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check code formatting
+
+### Package Management
+
+- Use `npm` as the package manager (not yarn or pnpm)
+- Use `npx shadcn@latest add [componentName]` to add ShadCN UI components
+
+## Architecture Overview
+
+The application follows a modular architecture with clear separation of concerns:
+
+### State Management (Zustand)
+
+- **TypingStore** (store/typing-store.ts): Manages typing state, word progression, statistics, and keyboard event handling
+- **KeyboardStore** (store/keyboard-store.ts): Tracks pressed keys and visual keyboard state
+- **LayoutStore** (store/layout-store.ts): Manages keyboard layout selection
+
+### Core Components
+
+- **TypingPractice** (components/typing-practice.tsx): Main container component
+- **WordDisplay** (components/typing/word-display.tsx): Displays words and handles typing input with real-time color feedback
+- **VirtualKeyboard** (components/keyboard/virtual-keyboard.tsx): Visual keyboard that syncs with physical input
+- **LayoutSelector** (components/layout-selector.tsx): Keyboard layout switcher
+
+### Utility Libraries
+
+- **lib/typing-stats.ts**: WPM and accuracy calculations
+- **lib/words.ts**: Word generation and management
+- **lib/keyboard.ts**: Keyboard layout definitions and mappings
+- **lib/typing-colors.ts**: Character color feedback logic
+
+### Type System
+
+Types are organized in the types/ directory:
+
+- **typing.types.ts**: Typing statistics and word count constants
+- **word.types.ts**: Word state and character status
+- **keyboard.types.ts**: Keyboard layouts and key mappings
+- **common.types.ts**: Shared utility types
+
+## Key Architectural Patterns
+
+### Event Flow
+
+1. User keyboard input → KeyboardStore.handleKeyDown()
+2. TypingStore.handleTypingKeyDown() processes input
+3. Character mapping via LayoutStore.layout
+4. Word state update and statistics calculation
+5. Component re-rendering with visual feedback
+
+### Color Feedback System
+
+Characters are colored in real-time:
+
+- Green: Correct input
+- Red: Incorrect input
+- Gray: Not yet typed
+
+### Statistics Calculation
+
+- **WPM**: (correct characters / 5) / time in minutes
+- **Accuracy**: (correct characters / total characters) × 100
+
+## Development Guidelines
+
+### Component Creation
+
+- Prioritize ShadCN UI components for all UI elements
+- Use TypeScript for all components and logic
+- Follow existing patterns for store integration
+
+### Code Style
+
+- Korean comments in code for context
+- Comprehensive JSDoc documentation for functions
+- Descriptive variable and function names
+- Consistent file organization following existing structure
+
+### Git Commit Convention
+
+Follow conventional commit format:
+
+```
+<type>: <subject>
+
+<body>
 ```
 
-### Code Quality
+Types: feat, fix, docs, style, refactor, test, chore
 
-```bash
-npm run lint         # ESLint checking
-npm run lint:fix     # Auto-fix ESLint issues
-npm run format       # Format code with Prettier
-npm run format:check # Check Prettier formatting
-```
+## Testing and Quality
 
-### Component Management
+- Run `npm run lint` before committing code
+- Ensure TypeScript compilation with `npm run build`
+- Use strict TypeScript configuration for type safety
+- Follow prettier formatting rules
 
-```bash
-npx shadcn@latest add [componentName]  # Add shadcn/ui components
-```
+## Key Features to Understand
 
-## Architecture
+1. **Real-time Typing**: Character-by-character input processing with immediate visual feedback
+2. **Statistics**: Live WPM and accuracy calculation during typing
+3. **Virtual Keyboard**: Physical keyboard state visualization with layout switching
+4. **Word Management**: Random word generation and progression through word sets
+5. **Theme System**: Dark/light mode support via next-themes
 
-### State Management
+## Store Integration Patterns
 
-- **Zustand stores** in `/store/` directory:
-  - `typing-store.ts` - Main typing practice state
-  - `keyboard-store.ts` - Virtual keyboard state
-  - `layout-store.ts` - Keyboard layout management
+When working with stores:
 
-### Key Directories
-
-- `app/` - Next.js App Router pages and layouts
-- `components/` - Reusable React components
-  - `components/ui/` - shadcn/ui components
-  - `components/typing/` - Typing practice components
-  - `components/keyboard/` - Virtual keyboard components
-- `lib/` - Business logic and utilities
-- `hooks/` - Custom React hooks
-- `schemas/` - Zod validation schemas (use instead of separate type files)
-
-### Type Safety
-
-- Use **Zod schemas** for type definitions in `/schemas/` directory
-- All components must use TypeScript
-- Schema validation is required for data structures
-
-### Component Standards
-
-- **Always use shadcn/ui components** when available
-- Install with: `npx shadcn@latest add [componentName]`
-- Components should be memoized for performance when appropriate
-- Follow existing patterns in `/components/` directory
-
-### Next.js Guidelines
-
-- Use **Server Actions** for simple CRUD operations
-- Use **API Routes** for complex business logic, external API calls, or authentication
-- No `src/` directory - files are in project root
-
-### Package Manager
-
-- Use **npm** (not yarn, pnpm, or bun)
+- Use Zustand's getState() for cross-store communication
+- Register/cleanup event listeners properly in typing store
+- Update statistics after each character input
+- Handle keyboard layout changes affecting key mappings
 
 ## Development Philosophy
 
@@ -90,22 +146,6 @@ npx shadcn@latest add [componentName]  # Add shadcn/ui components
 - **MVP 원칙**: 최소 기능부터 구현 후 필요에 따라 확장
 - **기존 패턴 활용**: 새로운 아키텍처보다는 기존 코드베이스의 패턴 활용
 - **단순한 해결책 우선**: 복잡한 솔루션보다는 단순하고 명확한 해결책 선택
-
-## Development Notes
-
-### Project Structure
-
-- No `src/` directory structure
-- Page-specific components go in route folders (e.g., `app/dashboard/DashboardStats.tsx`)
-- Reusable components go in `/components/`
-- Schema definitions use Zod in `/schemas/` directory
-
-### Code Style
-
-- ESLint with Airbnb style guide
-- Prettier with 2-space indentation, single quotes
-- 100 character line width
-- Import ordering rules enforced
 
 ## 언어 사용 규칙
 
