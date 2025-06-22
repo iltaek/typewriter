@@ -23,10 +23,3 @@ export interface KeyboardLayout {
 
 // 키 맵 타입
 export type KeyMap = Record<string, string>;
-
-// 키보드 상태 인터페이스
-export interface KeyboardState {
-  activeKeys: string[];
-  shiftPressed: boolean;
-  capsLocked: boolean;
-}
