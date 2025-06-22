@@ -278,23 +278,24 @@ export const useTypingStore = create<TypingState>()((set, get) => {
 
         set((state) => {
           const newWords = [...state.words];
-          const currentWord = { ...newWords[currentIndex] };
+          const currentWordCopy = { ...newWords[currentIndex] };
 
           // 글자 추가
-          const newTyped = currentWord.typed + mappedChar;
+          const newTyped = currentWordCopy.typed + mappedChar;
 
           // 최대 길이 초과하면 무시
-          if (!currentWord.word || newTyped.length > currentWord.word.length) {
+          if (!currentWordCopy.word || newTyped.length > currentWordCopy.word.length) {
             return state;
           }
 
           // 단어 상태 업데이트
-          currentWord.typed = newTyped;
-          currentWord.isCorrect = currentWord.word.startsWith(newTyped);
-          newWords[currentIndex] = currentWord;
+          currentWordCopy.typed = newTyped;
+          currentWordCopy.isCorrect = currentWordCopy.word.startsWith(newTyped);
+          newWords[currentIndex] = currentWordCopy;
 
           // 통계 업데이트를 위한 정타 여부 확인
-          const isCharCorrect = currentWord.word[currentWord.typed.length - 1] === mappedChar;
+          const isCharCorrect =
+            currentWordCopy.word[currentWordCopy.typed.length - 1] === mappedChar;
 
           // 비동기적으로 상태 업데이트 (get()으로 호출)
           setTimeout(() => updateStats(isCharCorrect), 0);

@@ -107,7 +107,7 @@ TypeWriter는 타이핑 연습을 위한 웹 애플리케이션입니다. 실시
 - 랜덤 단어 10개 표시
 - 실시간 입력 처리 및 색상 피드백
   - 🟢 정타: 초록색
-  - 🔴 오타: 빨간색  
+  - 🔴 오타: 빨간색
   - ⚪ 미입력: 회색
 - 단어 완성 시 자동 다음 단어 이동
 - 모든 단어 완성 시 새 단어 세트 생성
@@ -137,6 +137,7 @@ TypeWriter는 타이핑 연습을 위한 웹 애플리케이션입니다. 실시
 **매핑 로직**: `lib/keyboard.ts`, `lib/keyboard-mappings.ts`
 
 지원 레이아웃:
+
 - QWERTY (기본)
 - Dvorak
 - Colemak
@@ -144,13 +145,14 @@ TypeWriter는 타이핑 연습을 위한 웹 애플리케이션입니다. 실시
 ## 상태 관리 구조
 
 ### TypingStore
+
 ```typescript
 interface TypingState {
   words: WordState[]           // 타이핑할 단어들
   currentIndex: number         // 현재 단어 인덱스
   stats: TypingStats          // 타이핑 통계
   startTime: number | null    // 시작 시간
-  
+
   // 액션들
   handleTypingKeyDown: (e: KeyboardEvent) => void
   generateNewWords: () => void
@@ -161,20 +163,22 @@ interface TypingState {
 ```
 
 ### KeyboardStore
+
 ```typescript
 interface KeyboardState {
-  pressedKeys: Set<string>    // 현재 눌린 키들
-  handleKeyDown: (e: KeyboardEvent) => void
-  handleKeyUp: (e: KeyboardEvent) => void
-  onKeyPress?: (char: string) => void
+  pressedKeys: Set<string>; // 현재 눌린 키들
+  handleKeyDown: (e: KeyboardEvent) => void;
+  handleKeyUp: (e: KeyboardEvent) => void;
+  onKeyPress?: (char: string) => void;
 }
 ```
 
 ### LayoutStore
+
 ```typescript
 interface LayoutState {
-  layout: LayoutType          // 현재 키보드 레이아웃
-  setLayout: (layout: LayoutType) => void
+  layout: LayoutType; // 현재 키보드 레이아웃
+  setLayout: (layout: LayoutType) => void;
 }
 ```
 
