@@ -24,7 +24,7 @@ export const typingStateValidatorSchema = z.object({
       word: z.string(),
       typed: z.string(),
       isCorrect: z.boolean(),
-    })
+    }),
   ),
   currentIndex: z.number().int().min(0),
   stats: typingStatsSchema,

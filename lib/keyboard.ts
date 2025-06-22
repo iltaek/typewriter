@@ -1,5 +1,7 @@
 import { type KeyboardLayout, type KeyMap, type LayoutType } from '@/schemas/keyboard.schema';
 
+import { QWERTY_KEY_MAPPINGS } from './keyboard-mappings';
+
 // QWERTY 레이아웃 정의
 export const QWERTY_LAYOUT: KeyboardLayout = {
   row1: [
@@ -167,89 +169,73 @@ export const remapKey = (code: string, fromLayout: LayoutType, toLayout: LayoutT
 };
 
 // 키 코드에 해당하는 문자 반환 (수정됨)
-export const getCharacterFromKeyCode = (
-  code: string, // 물리적 키 코드 (예: KeyE)
-  layout: LayoutType,
-  isShift: boolean = false,
-): string => {
-  // QWERTY 기준 키 매핑 (확장됨) - 논리적 키 코드 -> 문자 매핑으로 사용
-  const qwertyKeyMappings: Record<string, [string, string]> = {
-    Backquote: ['`', '~'],
-    Digit1: ['1', '!'],
-    Digit2: ['2', '@'],
-    Digit3: ['3', '#'],
-    Digit4: ['4', '$'],
-    Digit5: ['5', '%'],
-    Digit6: ['6', '^'],
-    Digit7: ['7', '&'],
-    Digit8: ['8', '*'],
-    Digit9: ['9', '('],
-    Digit0: ['0', ')'],
-    Minus: ['-', '_'],
-    Equal: ['=', '+'],
-    BracketLeft: ['[', '{'],
-    BracketRight: [']', '}'],
-    Backslash: ['\\', '|'],
-    Semicolon: [';', ':'],
-    Quote: ["'", '"'],
-    Comma: [',', '<'],
-    Period: ['.', '>'],
-    Slash: ['/', '?'],
-    Space: [' ', ' '],
-    KeyA: ['a', 'A'],
-    KeyB: ['b', 'B'],
-    KeyC: ['c', 'C'],
-    KeyD: ['d', 'D'],
-    KeyE: ['e', 'E'],
-    KeyF: ['f', 'F'],
-    KeyG: ['g', 'G'],
-    KeyH: ['h', 'H'],
-    KeyI: ['i', 'I'],
-    KeyJ: ['j', 'J'],
-    KeyK: ['k', 'K'],
-    KeyL: ['l', 'L'],
-    KeyM: ['m', 'M'],
-    KeyN: ['n', 'N'],
-    KeyO: ['o', 'O'],
-    KeyP: ['p', 'P'],
-    KeyQ: ['q', 'Q'],
-    KeyR: ['r', 'R'],
-    KeyS: ['s', 'S'],
-    KeyT: ['t', 'T'],
-    KeyU: ['u', 'U'],
-    KeyV: ['v', 'V'],
-    KeyW: ['w', 'W'],
-    KeyX: ['x', 'X'],
-    KeyY: ['y', 'Y'],
-    KeyZ: ['z', 'Z'],
-  };
-
-  // 1. 물리적으로 눌린 키가 특수 키인지 확인
+/**
+ * 물리적 키 코드가 특수 키인지 확인하는 함수
+ * @param code 물리적 키 코드 (예: KeyE, Escape)
+ * @param layout 현재 키보드 레이아웃
+ * @returns 특수 키이면 true, 일반 키이면 false
+ */
+const isSpecialKey = (code: string, layout: LayoutType): boolean => {
   const layoutConfig = KEYBOARD_CONFIGS[layout];
 
-  // for...of 구문을 find 메서드로 리팩토링
   const physicalKeyData = Object.values(layoutConfig)
     .flatMap((row) => row)
     .find((key) => key.code === code);
 
-  // 특수 키(Shift, Ctrl 등)이면 빈 문자열 반환 (스페이스는 제외)
-  if (physicalKeyData?.isSpecial) {
-    return '';
-  }
-  // 스페이스바는 여기서 처리
-  if (code === 'Space') return ' ';
+  return physicalKeyData?.isSpecial ?? false;
+};
 
-  // 2. 선택된 레이아웃의 논리적 키 코드 결정
-  const logicalCode = layout === 'colemak' ? remapKey(code, 'qwerty', 'colemak') : code;
+/**
+ * 물리적 키 코드를 현재 레이아웃에 맞는 논리적 키 코드로 변환하는 함수
+ * @param code 물리적 키 코드
+ * @param layout 현재 키보드 레이아웃
+ * @returns 논리적 키 코드
+ */
+const getLogicalKeyCode = (code: string, layout: LayoutType): string => {
+  return layout === 'colemak' ? remapKey(code, 'qwerty', 'colemak') : code;
+};
 
-  // 3. 논리적 키 코드를 사용하여 문자 매핑 찾기
-  const keyMapEntry = qwertyKeyMappings[logicalCode];
+/**
+ * 논리적 키 코드와 Shift 상태를 기반으로 실제 문자를 반환하는 함수
+ * @param logicalCode 논리적 키 코드
+ * @param isShift Shift 키가 눌렸는지 여부
+ * @returns 해당하는 문자, 매핑이 없으면 빈 문자열
+ */
+const mapKeyToCharacter = (logicalCode: string, isShift: boolean): string => {
+  const keyMapEntry = QWERTY_KEY_MAPPINGS[logicalCode];
 
-  // 4. 매핑된 문자가 없으면 빈 문자열 반환
   if (!keyMapEntry) {
     return '';
   }
 
-  // 5. Shift 상태에 따라 올바른 문자 반환
   return keyMapEntry[isShift ? 1 : 0];
+};
+
+/**
+ * 물리적 키 코드를 현재 레이아웃과 Shift 상태에 따라 실제 문자로 변환하는 함수
+ * @param code 물리적 키 코드 (예: KeyE, Digit1)
+ * @param layout 현재 키보드 레이아웃 (qwerty, colemak)
+ * @param isShift Shift 키가 눌렸는지 여부
+ * @returns 해당하는 문자, 특수 키이거나 매핑이 없으면 빈 문자열
+ */
+export const getCharacterFromKeyCode = (
+  code: string,
+  layout: LayoutType,
+  isShift: boolean = false,
+): string => {
+  // 1. 특수 키 확인 (Shift, Ctrl, Tab 등)
+  if (isSpecialKey(code, layout)) {
+    return '';
+  }
+
+  // 2. 스페이스바 특별 처리
+  if (code === 'Space') {
+    return ' ';
+  }
+
+  // 3. 물리적 키 코드를 논리적 키 코드로 변환
+  const logicalCode = getLogicalKeyCode(code, layout);
+
+  // 4. 논리적 키 코드를 실제 문자로 매핑
+  return mapKeyToCharacter(logicalCode, isShift);
 };

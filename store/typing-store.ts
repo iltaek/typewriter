@@ -10,7 +10,16 @@ import { type WordState } from '@/schemas/word.schema';
 import { useKeyboardStore } from './keyboard-store';
 import { useLayoutStore } from './layout-store';
 
-// 타이핑 스토어 상태 인터페이스
+/**
+ * 타이핑 연습 애플리케이션의 상태 관리를 위한 Zustand 스토어 인터페이스
+ *
+ * 이 인터페이스는 다음과 같은 기능을 포함합니다:
+ * - 타이핑할 단어들의 상태 관리
+ * - 현재 입력 중인 단어의 인덱스 추적
+ * - 타이핑 통계 (WPM, 정확도) 계산 및 저장
+ * - 키보드 이벤트 처리 및 문자 입력 관리
+ * - 색상 피드백을 위한 문자 상태 계산
+ */
 interface TypingState {
   // 타이핑 할 단어들 상태
   words: WordState[];
@@ -22,34 +31,92 @@ interface TypingState {
   startTime: number | null;
 
   // 액션들
-  // 키 다운 이벤트 처리
+  /**
+   * 키보드 이벤트를 처리하여 타이핑 입력을 관리하는 함수
+   * - Backspace: 문자 삭제 및 이전 단어로 이동
+   * - Space: 다음 단어로 이동 또는 새 단어 세트 생성
+   * - 일반 문자: 현재 단어에 문자 추가 및 정확성 검사
+   * - 단축키: Ctrl+R, Ctrl+N, Escape로 재시작
+   * @param e - 키보드 이벤트 객체
+   */
   handleTypingKeyDown: (e: KeyboardEvent) => void;
-  // 새 단어 목록 생성
+
+  /**
+   * 새로운 단어 목록을 생성하고 타이핑 상태를 초기화하는 함수
+   * - WORDS_COUNT 개수만큼 랜덤 단어 선택
+   * - 모든 통계 초기화 (WPM, 정확도, 시작 시간)
+   * - 현재 인덱스를 0으로 리셋
+   */
   generateNewWords: () => void;
-  // 초기 단어 목록 설정
+
+  /**
+   * 서버에서 생성된 초기 단어 목록을 설정하는 함수
+   * 주로 컴포넌트 마운트 시 사용됨
+   * @param words - 초기 단어 배열
+   */
   setInitialWords: (words: string[]) => void;
-  // 타이핑 통계 업데이트
+
+  /**
+   * 타이핑 통계를 업데이트하는 함수
+   * - 정타/오타 개수 계산
+   * - WPM (Words Per Minute) 계산
+   * - 정확도 (Accuracy) 계산
+   * @param isCharCorrect - 입력한 문자가 정확한지 여부
+   */
   updateStats: (isCharCorrect: boolean) => void;
-  // 이전 단어의 글자 색상 결정
+
+  /**
+   * 이미 타이핑이 완료된 단어의 문자 색상을 결정하는 함수
+   * @param wordState - 단어 상태 객체
+   * @param charIndex - 문자 인덱스
+   * @returns 문자에 적용할 색상 클래스
+   */
   getPreviousWordColor: (wordState: WordState, charIndex: number) => ColorClass;
-  // 현재 입력 중인 단어의 글자 색상 결정
+
+  /**
+   * 현재 입력 중인 단어의 문자 색상을 결정하는 함수
+   * @param typedChar - 사용자가 입력한 문자
+   * @param targetChar - 목표 문자
+   * @returns 문자에 적용할 색상 클래스
+   */
   getCurrentCharacterColor: (typedChar: string | undefined, targetChar: string) => ColorClass;
-  // 글자 색상 계산 기능
+
+  /**
+   * 문자의 상태에 따라 적절한 색상을 계산하는 통합 함수
+   * - 현재 단어: getCurrentCharacterColor 사용
+   * - 이전 단어: getPreviousWordColor 사용
+   * - 다음 단어: PENDING 색상 사용
+   * @param wordState - 단어 상태 객체
+   * @param index - 단어 인덱스
+   * @param charIndex - 문자 인덱스
+   * @param targetChar - 목표 문자
+   * @returns 문자에 적용할 색상 클래스
+   */
   getCharacterColor: (
     wordState: WordState,
     index: number,
     charIndex: number,
-    targetChar: string
+    targetChar: string,
   ) => ColorClass;
-  // 키보드 이벤트 리스너 등록
+
+  /**
+   * 키보드 이벤트 리스너를 등록하는 함수
+   * - 기존 리스너가 있다면 먼저 정리
+   * - window에 keydown, keypress 이벤트 리스너 등록
+   * - cleanup 함수를 스토어에 저장
+   */
   registerKeyboardListeners: () => void;
-  // 이벤트 리스너 정리
+
+  /**
+   * 등록된 이벤트 리스너를 정리하는 함수
+   * 컴포넌트 언마운트 시 메모리 누수 방지를 위해 호출
+   */
   cleanup: () => void;
 }
 
 export const useTypingStore = create<TypingState>()((set, get) => {
-  // 클린업 함수 참조 저장용
-  let cleanupFunction: (() => void) | null = null;
+  // 클린업 함수 참조를 안전하게 저장하기 위한 변수
+  let currentCleanupFunction: (() => void) | null = null;
 
   return {
     // 초기 상태
@@ -131,6 +198,29 @@ export const useTypingStore = create<TypingState>()((set, get) => {
     handleTypingKeyDown: (e: KeyboardEvent) => {
       const { words, currentIndex, updateStats, generateNewWords } = get();
       const { layout } = useLayoutStore.getState();
+
+      // 키보드 단축키 처리 (Ctrl/Cmd + 키)
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key.toLowerCase()) {
+          case 'r':
+            e.preventDefault();
+            generateNewWords();
+            return;
+          case 'n':
+            e.preventDefault();
+            generateNewWords();
+            return;
+          default:
+            return;
+        }
+      }
+
+      // Escape 키로 재시작
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        generateNewWords();
+        return;
+      }
 
       // 현재 입력 중인 단어
       const currentWord = words[currentIndex];
@@ -234,7 +324,7 @@ export const useTypingStore = create<TypingState>()((set, get) => {
       wordState: WordState,
       index: number,
       charIndex: number,
-      targetChar: string
+      targetChar: string,
     ): ColorClass => {
       const { currentIndex, getPreviousWordColor, getCurrentCharacterColor } = get();
 
@@ -251,6 +341,12 @@ export const useTypingStore = create<TypingState>()((set, get) => {
     registerKeyboardListeners: () => {
       const { handleTypingKeyDown } = get();
 
+      // 기존 리스너가 있다면 먼저 정리
+      if (currentCleanupFunction) {
+        currentCleanupFunction();
+        currentCleanupFunction = null;
+      }
+
       // 키보드 스토어에 타이핑 핸들러 설정
       useKeyboardStore.getState().setOnKeyPress(undefined);
 
@@ -261,18 +357,19 @@ export const useTypingStore = create<TypingState>()((set, get) => {
       window.addEventListener('keydown', handleKeyDown);
       window.addEventListener('keypress', handleKeyPress);
 
-      // 클린업 함수 저장
-      cleanupFunction = () => {
+      // cleanup 함수를 로컬 변수에 저장 (상태 업데이트 없이)
+      currentCleanupFunction = () => {
         window.removeEventListener('keydown', handleKeyDown);
         window.removeEventListener('keypress', handleKeyPress);
+        currentCleanupFunction = null;
       };
     },
 
     // 이벤트 리스너 정리
     cleanup: () => {
-      if (cleanupFunction) {
-        cleanupFunction();
-        cleanupFunction = null;
+      if (currentCleanupFunction) {
+        currentCleanupFunction();
+        currentCleanupFunction = null;
       }
     },
   };
