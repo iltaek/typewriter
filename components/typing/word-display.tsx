@@ -32,32 +32,27 @@ export function WordDisplay({ initialWords }: WordDisplayProps) {
     cleanup,
   } = useTypingStore();
 
-  // 컴포넌트 마운트 시 초기 단어 목록 설정
+  // 컴포넌트 마운트 시 즉시 초기 단어 목록 설정
   useEffect(() => {
-    // 초기 단어 목록 설정
     setInitialWords([...initialWords]);
-
-    // 이벤트 리스너 등록
     registerKeyboardListeners();
-
-    // 클린업 함수 반환
     return cleanup;
-  }, [initialWords, setInitialWords, registerKeyboardListeners, cleanup]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 에러 상태 체크 (먼저 체크)
+  if (!initialWords.length) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-red-500">Error: No words provided</p>
+      </div>
+    );
+  }
 
   // 단어 데이터가 없으면 로딩 상태 또는 null 반환
   if (!words.length) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500">Loading words...</p>
-      </div>
-    );
-  }
-
-  // 에러 상태 체크
-  if (!initialWords.length) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-red-500">Error: No words provided</p>
+        <p className="text-gray-500">Loading words... (initialWords: {initialWords.length})</p>
       </div>
     );
   }
