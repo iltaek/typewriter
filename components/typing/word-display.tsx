@@ -2,6 +2,7 @@
 
 import { Fragment, useEffect } from 'react';
 
+import { getCharacterColor } from '@/lib/typing-colors';
 import { cn } from '@/lib/utils';
 import { useTypingStore } from '@/store/typing-store';
 
@@ -22,22 +23,19 @@ interface WordDisplayProps {
  */
 export function WordDisplay({ initialWords }: WordDisplayProps) {
   // Zustand 스토어에서 상태와 액션 가져오기
-  const {
-    words,
-    currentIndex,
-    stats,
-    getCharacterColor,
-    setInitialWords,
-    registerKeyboardListeners,
-    cleanup,
-  } = useTypingStore();
+  const { words, currentIndex, stats, setInitialWords, registerKeyboardListeners, cleanup } =
+    useTypingStore();
 
   // 컴포넌트 마운트 시 즉시 초기 단어 목록 설정
   useEffect(() => {
     setInitialWords([...initialWords]);
+  }, [initialWords, setInitialWords]);
+
+  // 키보드 리스너 등록 (한 번만)
+  useEffect(() => {
     registerKeyboardListeners();
     return cleanup;
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [registerKeyboardListeners, cleanup]);
 
   // 에러 상태 체크 (먼저 체크)
   if (!initialWords.length) {
@@ -103,7 +101,7 @@ export function WordDisplay({ initialWords }: WordDisplayProps) {
                   className={cn(
                     'transition-colors duration-150',
                     // 글자 상태(정타, 오타, 입력 전)에 따라 색상 적용
-                    getCharacterColor(wordState, index, charIndex, targetChar),
+                    getCharacterColor(wordState, index, currentIndex, charIndex, targetChar),
                   )}
                 >
                   {targetChar}
