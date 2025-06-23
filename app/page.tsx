@@ -1,7 +1,6 @@
 import TypingPractice from '@/components/typing-practice';
 import { getRandomWords } from '@/lib/words';
-
-const WORDS_COUNT = 10;
+import { WORDS_COUNT } from '@/types/typing.types';
 
 export default function Home() {
   const initialWords = getRandomWords(WORDS_COUNT);

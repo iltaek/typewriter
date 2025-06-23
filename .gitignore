@@ -49,5 +49,15 @@ next-env.d.ts
 # ESLint
 .eslintcache
 
-# vscode
+# IDE and AI tools
 .vscode
+.claude/
+.cursor/
+.idea/
+.fleet/
+
+# Test coverage
+coverage/
+
+# Markdown linting
+.markdownlint.json

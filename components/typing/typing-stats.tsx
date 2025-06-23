@@ -1,4 +1,4 @@
-import { type TypingStats } from '@/schemas/typing.schema';
+import { type TypingStats } from '@/types/typing.types';
 
 /**
  * 타이핑 통계 표시 컴포넌트의 Props 인터페이스입니다.

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { type KeyboardKey } from '@/schemas/keyboard.schema';
+import { type KeyboardKey } from '@/types/keyboard.types';
 
 import { Key } from './key';
 

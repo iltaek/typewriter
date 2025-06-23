@@ -3,8 +3,8 @@
 import React from 'react';
 
 import { Button } from '@/components/ui/button';
-import { type LayoutType } from '@/schemas/keyboard.schema';
 import { useLayoutStore } from '@/store/layout-store';
+import { type LayoutType } from '@/types/keyboard.types';
 
 /**
  * 키보드 레이아웃(QWERTY, Colemak 등)을 선택하는 버튼 그룹을 표시하는 컴포넌트입니다.
