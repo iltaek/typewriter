@@ -10,7 +10,7 @@ export interface KeyboardKey {
 }
 
 // 레이아웃 타입
-export type LayoutType = 'qwerty' | 'colemak';
+export type LayoutType = 'qwerty' | 'dvorak' | 'colemak';
 
 // 키보드 레이아웃 인터페이스
 export interface KeyboardLayout {

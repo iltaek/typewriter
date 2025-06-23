@@ -1,6 +1,6 @@
 import { type KeyboardLayout, type KeyMap, type LayoutType } from '@/types/keyboard.types';
 
-import { QWERTY_KEY_MAPPINGS } from './keyboard-mappings';
+import { QWERTY_KEY_MAPPINGS, DVORAK_KEY_MAPPINGS } from './keyboard-mappings';
 
 // QWERTY 레이아웃 정의
 export const QWERTY_LAYOUT: KeyboardLayout = {
@@ -128,9 +128,61 @@ export const COLEMAK_LAYOUT: KeyboardLayout = {
   row5: QWERTY_LAYOUT.row5,
 };
 
+// Dvorak 레이아웃 정의
+export const DVORAK_LAYOUT: KeyboardLayout = {
+  row1: QWERTY_LAYOUT.row1, // 숫자 행은 동일
+  row2: [
+    { key: 'Tab', code: 'Tab', isSpecial: true },
+    { key: "'", code: 'KeyQ' },
+    { key: ',', code: 'KeyW' },
+    { key: '.', code: 'KeyE' },
+    { key: 'P', code: 'KeyR' },
+    { key: 'Y', code: 'KeyT' },
+    { key: 'F', code: 'KeyY' },
+    { key: 'G', code: 'KeyU' },
+    { key: 'C', code: 'KeyI' },
+    { key: 'R', code: 'KeyO' },
+    { key: 'L', code: 'KeyP' },
+    { key: '/', code: 'BracketLeft' },
+    { key: '=', code: 'BracketRight' },
+    { key: '\\', code: 'Backslash' },
+  ],
+  row3: [
+    { key: 'Caps', code: 'CapsLock', isSpecial: true },
+    { key: 'A', code: 'KeyA' },
+    { key: 'O', code: 'KeyS' },
+    { key: 'E', code: 'KeyD' },
+    { key: 'U', code: 'KeyF' },
+    { key: 'I', code: 'KeyG' },
+    { key: 'D', code: 'KeyH' },
+    { key: 'H', code: 'KeyJ' },
+    { key: 'T', code: 'KeyK' },
+    { key: 'N', code: 'KeyL' },
+    { key: 'S', code: 'Semicolon' },
+    { key: '-', code: 'Quote' },
+    { key: 'Enter', code: 'Enter', isSpecial: true },
+  ],
+  row4: [
+    { key: 'Shift', code: 'ShiftLeft', isSpecial: true },
+    { key: ';', code: 'KeyZ' },
+    { key: 'Q', code: 'KeyX' },
+    { key: 'J', code: 'KeyC' },
+    { key: 'K', code: 'KeyV' },
+    { key: 'X', code: 'KeyB' },
+    { key: 'B', code: 'KeyN' },
+    { key: 'M', code: 'KeyM' },
+    { key: 'W', code: 'Comma' },
+    { key: 'V', code: 'Period' },
+    { key: 'Z', code: 'Slash' },
+    { key: 'Shift', code: 'ShiftRight', isSpecial: true },
+  ],
+  row5: QWERTY_LAYOUT.row5,
+};
+
 // 키보드 설정
 export const KEYBOARD_CONFIGS: Record<LayoutType, KeyboardLayout> = {
   qwerty: QWERTY_LAYOUT,
+  dvorak: DVORAK_LAYOUT,
   colemak: COLEMAK_LAYOUT,
 };
 
@@ -160,12 +212,21 @@ export const COLEMAK_TO_QWERTY: KeyMap = Object.fromEntries(
   Object.entries(QWERTY_TO_COLEMAK).map(([key, value]) => [value, key]),
 );
 
+
 // 키 매핑 함수
 export const remapKey = (code: string, fromLayout: LayoutType, toLayout: LayoutType): string => {
   if (fromLayout === toLayout) return code;
 
-  const mapping = fromLayout === 'qwerty' ? QWERTY_TO_COLEMAK : COLEMAK_TO_QWERTY;
-  return mapping[code] || code;
+  // QWERTY와 Colemak 간 매핑
+  if (fromLayout === 'qwerty' && toLayout === 'colemak') {
+    return QWERTY_TO_COLEMAK[code] || code;
+  }
+  if (fromLayout === 'colemak' && toLayout === 'qwerty') {
+    return COLEMAK_TO_QWERTY[code] || code;
+  }
+
+  // Dvorak은 직접 매핑을 사용하므로 키 코드 변환 불필요
+  return code;
 };
 
 // 키 코드에 해당하는 문자 반환 (수정됨)
@@ -192,29 +253,42 @@ const isSpecialKey = (code: string, layout: LayoutType): boolean => {
  * @returns 논리적 키 코드
  */
 const getLogicalKeyCode = (code: string, layout: LayoutType): string => {
-  return layout === 'colemak' ? remapKey(code, 'qwerty', 'colemak') : code;
+  if (layout === 'colemak') {
+    return remapKey(code, 'qwerty', 'colemak');
+  }
+  // Dvorak과 QWERTY는 물리적 키 코드를 그대로 사용
+  return code;
 };
 
 /**
  * 논리적 키 코드와 Shift 상태를 기반으로 실제 문자를 반환하는 함수
  * @param logicalCode 논리적 키 코드
+ * @param layout 현재 키보드 레이아웃 
  * @param isShift Shift 키가 눌렸는지 여부
  * @returns 해당하는 문자, 매핑이 없으면 빈 문자열
  */
-const mapKeyToCharacter = (logicalCode: string, isShift: boolean): string => {
+const mapKeyToCharacter = (logicalCode: string, layout: LayoutType, isShift: boolean): string => {
+  // Dvorak 레이아웃은 자체 매핑 테이블 사용
+  if (layout === 'dvorak') {
+    const keyMapEntry = DVORAK_KEY_MAPPINGS[logicalCode];
+    if (!keyMapEntry) {
+      return '';
+    }
+    return keyMapEntry[isShift ? 1 : 0];
+  }
+  
+  // QWERTY 및 Colemak은 QWERTY 매핑 테이블 사용
   const keyMapEntry = QWERTY_KEY_MAPPINGS[logicalCode];
-
   if (!keyMapEntry) {
     return '';
   }
-
   return keyMapEntry[isShift ? 1 : 0];
 };
 
 /**
  * 물리적 키 코드를 현재 레이아웃과 Shift 상태에 따라 실제 문자로 변환하는 함수
  * @param code 물리적 키 코드 (예: KeyE, Digit1)
- * @param layout 현재 키보드 레이아웃 (qwerty, colemak)
+ * @param layout 현재 키보드 레이아웃 (qwerty, dvorak, colemak)
  * @param isShift Shift 키가 눌렸는지 여부
  * @returns 해당하는 문자, 특수 키이거나 매핑이 없으면 빈 문자열
  */
@@ -237,5 +311,5 @@ export const getCharacterFromKeyCode = (
   const logicalCode = getLogicalKeyCode(code, layout);
 
   // 4. 논리적 키 코드를 실제 문자로 매핑
-  return mapKeyToCharacter(logicalCode, isShift);
+  return mapKeyToCharacter(logicalCode, layout, isShift);
 };
