@@ -98,7 +98,7 @@ Characters are colored in real-time:
 
 Follow conventional commit format:
 
-```
+```text
 <type>: <subject>
 
 <body>
