@@ -1,12 +1,15 @@
 import {
   QWERTY_LAYOUT,
   COLEMAK_LAYOUT,
+  DVORAK_LAYOUT,
   KEYBOARD_CONFIGS,
   QWERTY_TO_COLEMAK,
   COLEMAK_TO_QWERTY,
   remapKey,
   getCharacterFromKeyCode,
 } from '@/lib/keyboard';
+
+import { DVORAK_KEY_MAPPINGS } from '@/lib/keyboard-mappings';
 
 describe('KEYBOARD_CONFIGS', () => {
   describe('정상 케이스', () => {
@@ -30,21 +33,40 @@ describe('KEYBOARD_CONFIGS', () => {
       expect(colemak.row5).toBeDefined();
     });
 
-    test('QWERTY와 COLEMAK이 동일한 구조를 가짐', () => {
+    test('DVORAK 레이아웃이 올바르게 설정됨', () => {
+      const dvorak = KEYBOARD_CONFIGS.dvorak;
+      expect(dvorak).toBeDefined();
+      expect(dvorak.row1).toBeDefined();
+      expect(dvorak.row2).toBeDefined();
+      expect(dvorak.row3).toBeDefined();
+      expect(dvorak.row4).toBeDefined();
+      expect(dvorak.row5).toBeDefined();
+    });
+
+    test('모든 레이아웃이 동일한 구조를 가짐', () => {
       const qwerty = KEYBOARD_CONFIGS.qwerty;
       const colemak = KEYBOARD_CONFIGS.colemak;
+      const dvorak = KEYBOARD_CONFIGS.dvorak;
       
+      // QWERTY와 COLEMAK
       expect(qwerty.row1.length).toBe(colemak.row1.length);
       expect(qwerty.row2.length).toBe(colemak.row2.length);
       expect(qwerty.row3.length).toBe(colemak.row3.length);
       expect(qwerty.row4.length).toBe(colemak.row4.length);
       expect(qwerty.row5.length).toBe(colemak.row5.length);
+
+      // QWERTY와 DVORAK
+      expect(qwerty.row1.length).toBe(dvorak.row1.length);
+      expect(qwerty.row2.length).toBe(dvorak.row2.length);
+      expect(qwerty.row3.length).toBe(dvorak.row3.length);
+      expect(qwerty.row4.length).toBe(dvorak.row4.length);
+      expect(qwerty.row5.length).toBe(dvorak.row5.length);
     });
   });
 
   describe('실패 케이스', () => {
     test('존재하지 않는 레이아웃 접근', () => {
-      const invalidLayout = (KEYBOARD_CONFIGS as any).dvorak;
+      const invalidLayout = (KEYBOARD_CONFIGS as any).nonexistent;
       expect(invalidLayout).toBeUndefined();
     });
   });
@@ -67,9 +89,96 @@ describe('KEYBOARD_CONFIGS', () => {
       });
     });
 
-    test('QWERTY와 COLEMAK의 특정 행이 동일함 (row1, row5)', () => {
+    test('레이아웃 간 공유하는 행 확인', () => {
+      // QWERTY와 COLEMAK은 row1, row5를 공유
       expect(QWERTY_LAYOUT.row1).toEqual(COLEMAK_LAYOUT.row1);
       expect(QWERTY_LAYOUT.row5).toEqual(COLEMAK_LAYOUT.row5);
+      
+      // DVORAK은 고유한 row1을 가지지만 row5는 QWERTY와 공유
+      expect(QWERTY_LAYOUT.row5).toEqual(DVORAK_LAYOUT.row5);
+      expect(QWERTY_LAYOUT.row1).not.toEqual(DVORAK_LAYOUT.row1);
+    });
+  });
+});
+
+describe('DVORAK_KEY_MAPPINGS', () => {
+  describe('정상 케이스', () => {
+    test('기본 알파벳 키 매핑이 올바름', () => {
+      // Dvorak 레이아웃의 특징적인 매핑들 확인
+      expect(DVORAK_KEY_MAPPINGS.KeyQ).toEqual(["'", '"']); // Q 위치 → 따옴표
+      expect(DVORAK_KEY_MAPPINGS.KeyW).toEqual([',', '<']); // W 위치 → 쉼표
+      expect(DVORAK_KEY_MAPPINGS.KeyE).toEqual(['.', '>']); // E 위치 → 마침표
+      expect(DVORAK_KEY_MAPPINGS.KeyR).toEqual(['p', 'P']); // R 위치 → P
+      expect(DVORAK_KEY_MAPPINGS.KeyT).toEqual(['y', 'Y']); // T 위치 → Y
+    });
+
+    test('숫자 행 매핑이 QWERTY와 대부분 동일함', () => {
+      expect(DVORAK_KEY_MAPPINGS.Digit1).toEqual(['1', '!']);
+      expect(DVORAK_KEY_MAPPINGS.Digit2).toEqual(['2', '@']);
+      expect(DVORAK_KEY_MAPPINGS.Digit3).toEqual(['3', '#']);
+      expect(DVORAK_KEY_MAPPINGS.Digit0).toEqual(['0', ')']);
+    });
+
+    test('특수한 Dvorak 기호 매핑이 올바름', () => {
+      // Dvorak의 특별한 기호 매핑
+      expect(DVORAK_KEY_MAPPINGS.Minus).toEqual(['[', '{']); // - 위치 → [
+      expect(DVORAK_KEY_MAPPINGS.Equal).toEqual([']', '}']); // = 위치 → ]
+      expect(DVORAK_KEY_MAPPINGS.BracketLeft).toEqual(['/', '?']); // [ 위치 → /
+      expect(DVORAK_KEY_MAPPINGS.BracketRight).toEqual(['=', '+']); // ] 위치 → =
+    });
+
+    test('중간 행(홈 로우) 매핑이 올바름', () => {
+      expect(DVORAK_KEY_MAPPINGS.KeyA).toEqual(['a', 'A']); // A는 동일한 위치
+      expect(DVORAK_KEY_MAPPINGS.KeyS).toEqual(['o', 'O']); // S 위치 → O
+      expect(DVORAK_KEY_MAPPINGS.KeyD).toEqual(['e', 'E']); // D 위치 → E
+      expect(DVORAK_KEY_MAPPINGS.KeyF).toEqual(['u', 'U']); // F 위치 → U
+      expect(DVORAK_KEY_MAPPINGS.KeyG).toEqual(['i', 'I']); // G 위치 → I
+    });
+
+    test('하단 행 매핑이 올바름', () => {
+      expect(DVORAK_KEY_MAPPINGS.KeyZ).toEqual([';', ':']); // Z 위치 → 세미콜론
+      expect(DVORAK_KEY_MAPPINGS.KeyX).toEqual(['q', 'Q']); // X 위치 → Q
+      expect(DVORAK_KEY_MAPPINGS.KeyC).toEqual(['j', 'J']); // C 위치 → J
+      expect(DVORAK_KEY_MAPPINGS.KeyV).toEqual(['k', 'K']); // V 위치 → K
+      expect(DVORAK_KEY_MAPPINGS.KeyB).toEqual(['x', 'X']); // B 위치 → X
+    });
+
+    test('스페이스 키 매핑', () => {
+      expect(DVORAK_KEY_MAPPINGS.Space).toEqual([' ', ' ']);
+    });
+  });
+
+  describe('실패 케이스', () => {
+    test('존재하지 않는 키 접근', () => {
+      expect(DVORAK_KEY_MAPPINGS.InvalidKey).toBeUndefined();
+      expect(DVORAK_KEY_MAPPINGS.KeyΩ).toBeUndefined();
+    });
+  });
+
+  describe('엣지 케이스', () => {
+    test('모든 매핑이 2개 요소 배열을 가짐', () => {
+      Object.values(DVORAK_KEY_MAPPINGS).forEach(mapping => {
+        expect(Array.isArray(mapping)).toBe(true);
+        expect(mapping).toHaveLength(2);
+        expect(typeof mapping[0]).toBe('string');
+        expect(typeof mapping[1]).toBe('string');
+      });
+    });
+
+    test('매핑 테이블이 비어있지 않음', () => {
+      expect(Object.keys(DVORAK_KEY_MAPPINGS).length).toBeGreaterThan(0);
+    });
+
+    test('모든 기본 알파벳 키가 매핑됨', () => {
+      const alphabetKeys = [
+        'KeyA', 'KeyB', 'KeyC', 'KeyD', 'KeyE', 'KeyF', 'KeyG', 'KeyH', 'KeyI',
+        'KeyJ', 'KeyK', 'KeyL', 'KeyM', 'KeyN', 'KeyO', 'KeyP', 'KeyQ', 'KeyR',
+        'KeyS', 'KeyT', 'KeyU', 'KeyV', 'KeyW', 'KeyX', 'KeyY', 'KeyZ'
+      ];
+      
+      alphabetKeys.forEach(key => {
+        expect(DVORAK_KEY_MAPPINGS[key]).toBeDefined();
+      });
     });
   });
 });
@@ -135,6 +244,15 @@ describe('remapKey', () => {
     test('동일한 레이아웃 간 매핑 - 변경 없음', () => {
       expect(remapKey('KeyE', 'qwerty', 'qwerty')).toBe('KeyE');
       expect(remapKey('KeyF', 'colemak', 'colemak')).toBe('KeyF');
+      expect(remapKey('KeyQ', 'dvorak', 'dvorak')).toBe('KeyQ');
+    });
+
+    test('Dvorak 레이아웃은 직접 매핑 사용으로 키 코드 변환 불필요', () => {
+      // Dvorak은 물리적 키 코드를 그대로 사용하고 mapKeyToCharacter에서 직접 매핑
+      expect(remapKey('KeyE', 'qwerty', 'dvorak')).toBe('KeyE');
+      expect(remapKey('KeyR', 'dvorak', 'qwerty')).toBe('KeyR');
+      expect(remapKey('KeyA', 'dvorak', 'colemak')).toBe('KeyA');
+      expect(remapKey('KeyZ', 'colemak', 'dvorak')).toBe('KeyZ');
     });
 
     test('매핑되지 않은 키는 그대로 반환', () => {
@@ -212,6 +330,54 @@ describe('getCharacterFromKeyCode', () => {
       expect(getCharacterFromKeyCode('KeyR', 'colemak', true)).toBe('P');
     });
 
+    test('DVORAK 레이아웃 기본 문자 매핑', () => {
+      // Dvorak의 특징적인 키 매핑들
+      expect(getCharacterFromKeyCode('KeyQ', 'dvorak')).toBe("'"); // Q → 따옴표
+      expect(getCharacterFromKeyCode('KeyW', 'dvorak')).toBe(','); // W → 쉼표
+      expect(getCharacterFromKeyCode('KeyE', 'dvorak')).toBe('.'); // E → 마침표
+      expect(getCharacterFromKeyCode('KeyR', 'dvorak')).toBe('p'); // R → P
+      expect(getCharacterFromKeyCode('KeyT', 'dvorak')).toBe('y'); // T → Y
+    });
+
+    test('DVORAK 레이아웃 Shift + 문자 매핑', () => {
+      expect(getCharacterFromKeyCode('KeyQ', 'dvorak', true)).toBe('"'); // Q → 쌍따옴표
+      expect(getCharacterFromKeyCode('KeyW', 'dvorak', true)).toBe('<'); // W → <
+      expect(getCharacterFromKeyCode('KeyE', 'dvorak', true)).toBe('>'); // E → >
+      expect(getCharacterFromKeyCode('KeyR', 'dvorak', true)).toBe('P'); // R → P
+      expect(getCharacterFromKeyCode('KeyT', 'dvorak', true)).toBe('Y'); // T → Y
+    });
+
+    test('DVORAK 레이아웃 홈 로우(중간 행) 매핑', () => {
+      expect(getCharacterFromKeyCode('KeyA', 'dvorak')).toBe('a'); // A는 동일
+      expect(getCharacterFromKeyCode('KeyS', 'dvorak')).toBe('o'); // S → O
+      expect(getCharacterFromKeyCode('KeyD', 'dvorak')).toBe('e'); // D → E
+      expect(getCharacterFromKeyCode('KeyF', 'dvorak')).toBe('u'); // F → U
+      expect(getCharacterFromKeyCode('KeyG', 'dvorak')).toBe('i'); // G → I
+    });
+
+    test('DVORAK 레이아웃 하단 행 매핑', () => {
+      expect(getCharacterFromKeyCode('KeyZ', 'dvorak')).toBe(';'); // Z → 세미콜론
+      expect(getCharacterFromKeyCode('KeyX', 'dvorak')).toBe('q'); // X → Q
+      expect(getCharacterFromKeyCode('KeyC', 'dvorak')).toBe('j'); // C → J
+      expect(getCharacterFromKeyCode('KeyV', 'dvorak')).toBe('k'); // V → K
+      expect(getCharacterFromKeyCode('KeyB', 'dvorak')).toBe('x'); // B → X
+    });
+
+    test('DVORAK 레이아웃 특수 기호 매핑', () => {
+      // Dvorak의 독특한 기호 배치
+      expect(getCharacterFromKeyCode('Minus', 'dvorak')).toBe('['); // - 위치 → [
+      expect(getCharacterFromKeyCode('Equal', 'dvorak')).toBe(']'); // = 위치 → ]
+      expect(getCharacterFromKeyCode('BracketLeft', 'dvorak')).toBe('/'); // [ 위치 → /
+      expect(getCharacterFromKeyCode('BracketRight', 'dvorak')).toBe('='); // ] 위치 → =
+    });
+
+    test('DVORAK 레이아웃 숫자 키 (QWERTY와 동일)', () => {
+      expect(getCharacterFromKeyCode('Digit1', 'dvorak')).toBe('1');
+      expect(getCharacterFromKeyCode('Digit2', 'dvorak')).toBe('2');
+      expect(getCharacterFromKeyCode('Digit3', 'dvorak')).toBe('3');
+      expect(getCharacterFromKeyCode('Digit0', 'dvorak')).toBe('0');
+    });
+
     test('특수문자 키', () => {
       expect(getCharacterFromKeyCode('Comma', 'qwerty')).toBe(',');
       expect(getCharacterFromKeyCode('Period', 'qwerty')).toBe('.');
@@ -230,6 +396,8 @@ describe('getCharacterFromKeyCode', () => {
       expect(getCharacterFromKeyCode('Space', 'qwerty')).toBe(' ');
       expect(getCharacterFromKeyCode('Space', 'qwerty', true)).toBe(' ');
       expect(getCharacterFromKeyCode('Space', 'colemak')).toBe(' ');
+      expect(getCharacterFromKeyCode('Space', 'dvorak')).toBe(' ');
+      expect(getCharacterFromKeyCode('Space', 'dvorak', true)).toBe(' ');
     });
   });
 
@@ -276,38 +444,80 @@ describe('getCharacterFromKeyCode', () => {
       expect(getCharacterFromKeyCode('KeyZ', 'colemak')).toBe('z');
       expect(getCharacterFromKeyCode('KeyZ', 'colemak', true)).toBe('Z');
     });
+
+    test('DVORAK 레이아웃에서 존재하지 않는 키', () => {
+      expect(getCharacterFromKeyCode('InvalidKey', 'dvorak')).toBe('');
+      expect(getCharacterFromKeyCode('KeyΩ', 'dvorak')).toBe('');
+    });
   });
 
   describe('레이아웃 간 일관성 테스트', () => {
-    test('숫자와 특수문자는 모든 레이아웃에서 동일', () => {
-      const keys = ['Digit1', 'Digit2', 'Comma', 'Period', 'Space'];
+    test('숫자 키는 모든 레이아웃에서 동일', () => {
+      const digitKeys = ['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0'];
+      
+      digitKeys.forEach(key => {
+        const qwertyResult = getCharacterFromKeyCode(key, 'qwerty');
+        const colemakResult = getCharacterFromKeyCode(key, 'colemak');
+        const dvorakResult = getCharacterFromKeyCode(key, 'dvorak');
+        
+        expect(qwertyResult).toBe(colemakResult);
+        expect(qwertyResult).toBe(dvorakResult);
+        
+        const qwertyShiftResult = getCharacterFromKeyCode(key, 'qwerty', true);
+        const colemakShiftResult = getCharacterFromKeyCode(key, 'colemak', true);
+        const dvorakShiftResult = getCharacterFromKeyCode(key, 'dvorak', true);
+        
+        expect(qwertyShiftResult).toBe(colemakShiftResult);
+        expect(qwertyShiftResult).toBe(dvorakShiftResult);
+      });
+    });
+
+    test('스페이스바는 모든 레이아웃에서 동일', () => {
+      expect(getCharacterFromKeyCode('Space', 'qwerty')).toBe(' ');
+      expect(getCharacterFromKeyCode('Space', 'colemak')).toBe(' ');
+      expect(getCharacterFromKeyCode('Space', 'dvorak')).toBe(' ');
+    });
+
+    test('QWERTY와 COLEMAK에서 일부 특수문자 동일', () => {
+      // 이들은 QWERTY와 COLEMAK에서 동일하지만 Dvorak에서는 다름
+      const keys = ['Comma', 'Period'];
       
       keys.forEach(key => {
         const qwertyResult = getCharacterFromKeyCode(key, 'qwerty');
         const colemakResult = getCharacterFromKeyCode(key, 'colemak');
         expect(qwertyResult).toBe(colemakResult);
-        
-        const qwertyShiftResult = getCharacterFromKeyCode(key, 'qwerty', true);
-        const colemakShiftResult = getCharacterFromKeyCode(key, 'colemak', true);
-        expect(qwertyShiftResult).toBe(colemakShiftResult);
       });
     });
 
-    test('매핑된 키들이 올바르게 변환됨', () => {
-      // QWERTY의 E는 COLEMAK에서 F가 되어야 함
-      expect(getCharacterFromKeyCode('KeyE', 'qwerty')).toBe('e');
-      expect(getCharacterFromKeyCode('KeyE', 'colemak')).toBe('f');
+    test('각 레이아웃의 고유 매핑이 올바름', () => {
+      // 동일한 물리적 키(KeyE)가 각 레이아웃에서 다른 문자를 생성
+      expect(getCharacterFromKeyCode('KeyE', 'qwerty')).toBe('e');  // QWERTY: E
+      expect(getCharacterFromKeyCode('KeyE', 'colemak')).toBe('f'); // COLEMAK: F 
+      expect(getCharacterFromKeyCode('KeyE', 'dvorak')).toBe('.');  // DVORAK: 마침표
       
-      // QWERTY의 F는 COLEMAK에서 T가 되어야 함
-      expect(getCharacterFromKeyCode('KeyF', 'qwerty')).toBe('f');
-      expect(getCharacterFromKeyCode('KeyF', 'colemak')).toBe('t');
+      // 동일한 물리적 키(KeyQ)가 각 레이아웃에서 다른 문자를 생성
+      expect(getCharacterFromKeyCode('KeyQ', 'qwerty')).toBe('q');  // QWERTY: Q
+      expect(getCharacterFromKeyCode('KeyQ', 'colemak')).toBe('q'); // COLEMAK: Q (동일)
+      expect(getCharacterFromKeyCode('KeyQ', 'dvorak')).toBe("'"); // DVORAK: 따옴표
+    });
+
+    test('Dvorak의 특수 기호 매핑이 다른 레이아웃과 구별됨', () => {
+      // Minus 키 위치의 차이
+      expect(getCharacterFromKeyCode('Minus', 'qwerty')).toBe('-');  // QWERTY: -
+      expect(getCharacterFromKeyCode('Minus', 'colemak')).toBe('-'); // COLEMAK: -
+      expect(getCharacterFromKeyCode('Minus', 'dvorak')).toBe('[');  // DVORAK: [
+      
+      // Equal 키 위치의 차이
+      expect(getCharacterFromKeyCode('Equal', 'qwerty')).toBe('=');  // QWERTY: =
+      expect(getCharacterFromKeyCode('Equal', 'colemak')).toBe('='); // COLEMAK: =
+      expect(getCharacterFromKeyCode('Equal', 'dvorak')).toBe(']');  // DVORAK: ]
     });
   });
 
   describe('성능 테스트', () => {
     test('대량 키 변환 성능', () => {
       const keys = ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyE', 'KeyR', 'KeyT', 'KeyY'];
-      const layouts = ['qwerty', 'colemak'] as const;
+      const layouts = ['qwerty', 'colemak', 'dvorak'] as const;
       
       const start = process.hrtime.bigint();
       
@@ -324,9 +534,9 @@ describe('getCharacterFromKeyCode', () => {
       const end = process.hrtime.bigint();
       const executionTime = Number(end - start) / 1000000; // 나노초를 밀리초로 변환
       
-      // 16000번 호출(8키 × 2레이아웃 × 2상태 × 1000번)이 200ms 미만이어야 함
+      // 24000번 호출(8키 × 3레이아웃 × 2상태 × 1000번)이 300ms 미만이어야 함
       // 키보드 매핑은 복잡한 로직이므로 여유있는 시간 설정
-      expect(executionTime).toBeLessThan(200);
+      expect(executionTime).toBeLessThan(300);
     });
   });
 
@@ -338,6 +548,7 @@ describe('getCharacterFromKeyCode', () => {
       for (let i = 0; i < 1000; i++) {
         getCharacterFromKeyCode('KeyA', 'qwerty');
         getCharacterFromKeyCode('KeyE', 'colemak');
+        getCharacterFromKeyCode('KeyQ', 'dvorak');
       }
       
       // 원본 매핑 객체가 변경되지 않았는지 확인

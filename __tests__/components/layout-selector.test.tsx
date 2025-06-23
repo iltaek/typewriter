@@ -41,9 +41,10 @@ describe('LayoutSelector', () => {
       const layoutContainer = container.querySelector('.flex.justify-center.gap-4');
       expect(layoutContainer).toBeInTheDocument();
       
-      // 또는 버튼들이 존재하는지 확인
+      // 모든 레이아웃 버튼들이 존재하는지 확인
       expect(screen.getByTestId('layout-btn-qwerty')).toBeInTheDocument();
       expect(screen.getByTestId('layout-btn-colemak')).toBeInTheDocument();
+      expect(screen.getByTestId('layout-btn-dvorak')).toBeInTheDocument();
     });
 
     test('사용 가능한 레이아웃 버튼들이 표시됨', () => {
@@ -51,9 +52,11 @@ describe('LayoutSelector', () => {
       
       expect(screen.getByTestId('layout-btn-qwerty')).toBeInTheDocument();
       expect(screen.getByTestId('layout-btn-colemak')).toBeInTheDocument();
+      expect(screen.getByTestId('layout-btn-dvorak')).toBeInTheDocument();
       
       expect(screen.getByText('QWERTY')).toBeInTheDocument();
       expect(screen.getByText('Colemak')).toBeInTheDocument();
+      expect(screen.getByText('Dvorak')).toBeInTheDocument();
     });
 
     test('컨테이너가 올바른 클래스를 가짐', () => {
@@ -67,7 +70,7 @@ describe('LayoutSelector', () => {
       render(<LayoutSelector />);
       
       const buttons = screen.getAllByRole('button');
-      expect(buttons).toHaveLength(2);
+      expect(buttons).toHaveLength(3);
       
       buttons.forEach(button => {
         expect(button).toBeInTheDocument();
@@ -82,9 +85,11 @@ describe('LayoutSelector', () => {
       
       const qwertyBtn = screen.getByTestId('layout-btn-qwerty');
       const colemakBtn = screen.getByTestId('layout-btn-colemak');
+      const dvorakBtn = screen.getByTestId('layout-btn-dvorak');
       
       expect(qwertyBtn).toHaveAttribute('data-variant', 'default');
       expect(colemakBtn).toHaveAttribute('data-variant', 'secondary');
+      expect(dvorakBtn).toHaveAttribute('data-variant', 'secondary');
     });
 
     test('다른 레이아웃이 선택된 경우 버튼 상태 변경', () => {
@@ -93,9 +98,24 @@ describe('LayoutSelector', () => {
       
       const qwertyBtn = screen.getByTestId('layout-btn-qwerty');
       const colemakBtn = screen.getByTestId('layout-btn-colemak');
+      const dvorakBtn = screen.getByTestId('layout-btn-dvorak');
       
       expect(qwertyBtn).toHaveAttribute('data-variant', 'secondary');
       expect(colemakBtn).toHaveAttribute('data-variant', 'default');
+      expect(dvorakBtn).toHaveAttribute('data-variant', 'secondary');
+    });
+
+    test('Dvorak이 선택된 경우 버튼 상태 변경', () => {
+      mockLayout = 'dvorak';
+      render(<LayoutSelector />);
+      
+      const qwertyBtn = screen.getByTestId('layout-btn-qwerty');
+      const colemakBtn = screen.getByTestId('layout-btn-colemak');
+      const dvorakBtn = screen.getByTestId('layout-btn-dvorak');
+      
+      expect(qwertyBtn).toHaveAttribute('data-variant', 'secondary');
+      expect(colemakBtn).toHaveAttribute('data-variant', 'secondary');
+      expect(dvorakBtn).toHaveAttribute('data-variant', 'default');
     });
 
     test('aria-pressed 속성이 올바르게 설정됨', () => {
@@ -104,9 +124,11 @@ describe('LayoutSelector', () => {
       
       const qwertyBtn = screen.getByTestId('layout-btn-qwerty');
       const colemakBtn = screen.getByTestId('layout-btn-colemak');
+      const dvorakBtn = screen.getByTestId('layout-btn-dvorak');
       
       expect(qwertyBtn).toHaveAttribute('aria-pressed', 'true');
       expect(colemakBtn).toHaveAttribute('aria-pressed', 'false');
+      expect(dvorakBtn).toHaveAttribute('aria-pressed', 'false');
     });
 
     test('각 버튼이 올바른 텍스트를 표시함', () => {
@@ -114,6 +136,7 @@ describe('LayoutSelector', () => {
       
       expect(screen.getByTestId('layout-btn-qwerty')).toHaveTextContent('QWERTY');
       expect(screen.getByTestId('layout-btn-colemak')).toHaveTextContent('Colemak');
+      expect(screen.getByTestId('layout-btn-dvorak')).toHaveTextContent('Dvorak');
     });
   });
 
@@ -135,6 +158,16 @@ describe('LayoutSelector', () => {
       fireEvent.click(colemakBtn);
       
       expect(mockSetLayout).toHaveBeenCalledWith('colemak');
+      expect(mockSetLayout).toHaveBeenCalledTimes(1);
+    });
+
+    test('Dvorak 버튼 클릭 시 setLayout 호출', () => {
+      render(<LayoutSelector />);
+      
+      const dvorakBtn = screen.getByTestId('layout-btn-dvorak');
+      fireEvent.click(dvorakBtn);
+      
+      expect(mockSetLayout).toHaveBeenCalledWith('dvorak');
       expect(mockSetLayout).toHaveBeenCalledTimes(1);
     });
 
