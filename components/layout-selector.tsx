@@ -7,7 +7,7 @@ import { useLayoutStore } from '@/store/layout-store';
 import { type LayoutType } from '@/types/keyboard.types';
 
 /**
- * 키보드 레이아웃(QWERTY, Colemak 등)을 선택하는 버튼 그룹을 표시하는 컴포넌트입니다.
+ * 키보드 레이아웃(QWERTY, Dvorak, Colemak 등)을 선택하는 버튼 그룹을 표시하는 컴포넌트입니다.
  * 사용자가 레이아웃을 선택하면 레이아웃 스토어의 setLayout을 호출합니다.
  */
 export function LayoutSelector() {
@@ -17,6 +17,7 @@ export function LayoutSelector() {
   /** 사용 가능한 키보드 레이아웃 목록 */
   const LAYOUTS: { value: LayoutType; label: string }[] = [
     { value: 'qwerty', label: 'QWERTY' },
+    { value: 'dvorak', label: 'Dvorak' },
     { value: 'colemak', label: 'Colemak' },
   ];
 
