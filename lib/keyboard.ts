@@ -130,7 +130,22 @@ export const COLEMAK_LAYOUT: KeyboardLayout = {
 
 // Dvorak 레이아웃 정의
 export const DVORAK_LAYOUT: KeyboardLayout = {
-  row1: QWERTY_LAYOUT.row1, // 숫자 행은 동일
+  row1: [
+    { key: '`', code: 'Backquote' },
+    { key: '1', code: 'Digit1' },
+    { key: '2', code: 'Digit2' },
+    { key: '3', code: 'Digit3' },
+    { key: '4', code: 'Digit4' },
+    { key: '5', code: 'Digit5' },
+    { key: '6', code: 'Digit6' },
+    { key: '7', code: 'Digit7' },
+    { key: '8', code: 'Digit8' },
+    { key: '9', code: 'Digit9' },
+    { key: '0', code: 'Digit0' },
+    { key: '[', code: 'Minus' },
+    { key: ']', code: 'Equal' },
+    { key: 'Backspace', code: 'Backspace', isSpecial: true },
+  ],
   row2: [
     { key: 'Tab', code: 'Tab', isSpecial: true },
     { key: "'", code: 'KeyQ' },
